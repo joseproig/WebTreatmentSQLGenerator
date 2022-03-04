@@ -1,0 +1,4 @@
+npm run dev (Per compilar tot el que tenim)
+npx tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --watch (Per compilar totes les classes que incoporem al wig relacionades amb tailwind)
+
+symfony server:start
