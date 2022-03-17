@@ -6,9 +6,14 @@ class Question
 {
     private $id;
 
-    private $templateQuestion;
+    
 
     private $pathToDbFile;
+
+
+    public function __construct(){
+        $this->templateQuestions = array (new TemplateQuestion);
+    }
 
     public function getId() {
         return $this->id;
@@ -18,12 +23,12 @@ class Question
         $this->id = $id;
     }
 
-    public function getTemplateQuestion() {
-        return $this->templateQuestion;
+    public function getTemplateQuestions() {
+        return $this->templateQuestions;
     }
 
-    public function setTemplateQuestion (string $templateQuestion) {
-        $this->templateQuestion = $templateQuestion;
+    public function setTemplateQuestions (array $templateQuestions) {
+        $this->templateQuestions = $templateQuestions;
     }
 
     public function getPathToDbFile() {

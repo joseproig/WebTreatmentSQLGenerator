@@ -1,16 +1,29 @@
 {% extends "base.html.twig" %}
 
+
+
 {% block body %}
     <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
         <h1 class="text-center mt-1 text-4xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
     </div>
+
     {{form_start(form)}}
         <div class="w-full h-full flex justify-center grid justify-items-center">
-           
-            
-            {{form_widget(form)}}
-            
-            <button class="py-5">
+
+            {{ form_row(form.pathToDbFile) }}
+
+            <ul class="w-full"  id="templateQuestions"
+            data-prototype="{{ form_widget(form.templateQuestions.vars.prototype)|e }}"
+            data-widget-tags="{{ '<li class="py-2"></li>'|e }}"
+            data-widget-counter="{{ form.templateQuestions|length }}">
+
+                {% for templateQuestion in form.templateQuestions %}
+                    <li class="w-full py-2">{{ form_row(templateQuestion) }}</li>
+                {% endfor %}
+
+            </ul>
+
+            <button class="add-another-collection-widget py-5" data-list-selector="#templateQuestions">
                 <svg class="h-8 w-8 text-red-500"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="12" r="9" />  <line x1="9" y1="12" x2="15" y2="12" />  <line x1="12" y1="9" x2="12" y2="15" /></svg>
             </button>
 
@@ -18,5 +31,6 @@
                 Genera
             </button>
         </div>
+       
     {{form_end(form)}}
 {% endblock %}
