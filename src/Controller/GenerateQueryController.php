@@ -8,6 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\QuestionFormType;
 use Symfony\Component\HttpFoundation\Request;
+use App\Logic\RestAPIController;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
 use DateTime;
 
 class GenerateQueryController extends AbstractController
@@ -22,6 +27,7 @@ class GenerateQueryController extends AbstractController
         $form = $this->createForm(QuestionFormType::class,$query);
         
         $errorInFile = false;
+        $errorInTemplate = false;
 
         //Obtenim la petició
         $form->handleRequest($request);
@@ -43,7 +49,14 @@ class GenerateQueryController extends AbstractController
                     $pathDirectory,
                     $fileName
                 );
-                $question->setPathToDBFile($pathDirectory . $fileName);
+                $restAPIController = new RestAPIController();
+                $question->setPathToDBFile($pathDirectory . '/' . $fileName);
+                
+                $responseToPetition = $restAPIController->getPossibilities($question);
+                var_dump($responseToPetition);
+                //if ($responseToPetition->getStatusCode() == 200) {
+
+                //} 
 
             } else {
                 $errorInFile = true;

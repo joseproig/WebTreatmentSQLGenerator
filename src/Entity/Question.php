@@ -10,9 +10,10 @@ class Question
 
     private $pathToDbFile;
 
+    private $templateQuestions;
 
     public function __construct(){
-        $this->templateQuestions = array (new TemplateQuestion);
+        $this->templateQuestions = array ('');
     }
 
     public function getId() {

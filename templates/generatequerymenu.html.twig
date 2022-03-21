@@ -10,7 +10,7 @@
     {{form_start(form)}}
         <div class="w-full h-full flex justify-center grid justify-items-center">
 
-            {% if errorInFile == true %}
+            {% if errorInFile %}
                 {{ form_row(form.pathToDbFile, { 'attr': {'class': 'block
                             px-3
                             py-1
@@ -23,18 +23,85 @@
                             text-red-700
                             focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'},
                             'help' : 'Se ha introducido un formato de fichero que no es válido',
-                            'help_attr': {'class': 'font-sans text-red-700'}
-                            }) }}
+                            'help_attr': {'class': 'font-sans text-red-700'},
+                            'label_attr':{'class':'font-sans text-white'},
+                            'row_attr':{'class':'py-10 grid justify-items-center'} 
+
+                }) }}
             {% else %}
-                {{ form_row(form.pathToDbFile) }}
+                {{ form_row(form.pathToDbFile,{
+                    'attr':{
+                        'class':'block
+                        px-3
+                        py-1
+                        text-base
+                        font-normal
+                        bg-transparent bg-clip-padding
+                        border border-solid border-gray-300
+                        rounded
+                        m-0
+                        text-white
+                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
+                    },
+                    'label_attr':{'class':'font-sans text-white'},
+                    'row_attr':{'class':'py-10 grid justify-items-center'} 
+                }) }}
             {% endif %}
             <ul class="w-full"  id="templateQuestions"
-            data-prototype="{{ form_widget(form.templateQuestions.vars.prototype)|e }}"
+            data-prototype="{{ form_row(form.templateQuestions.vars.prototype,{
+                                'attr':{
+                                    'class':'block
+                                                w-full
+                                                my-3
+                                                text-base
+                                                font-normal
+                                                text-gray-700
+                                                bg-white bg-clip-padding
+                                                border border-solid border-gray-300
+                                                rounded
+                                                transition
+                                                ease-in-out
+                                                m-0
+                                                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                                    'placeholder':'Tu modelo de plantilla...',
+                                    'rows':'7'
+                                },
+                                'label':'Plantilla de la query que quieres usar:',
+                                'label_attr':{'class':'font-sans text-slate-900'},
+                                'row_attr':{'class' : 'w-full grid justify-items-center bg-slate-100 px-3 rounded-lg py-3'},
+                            })|e }}"
             data-widget-tags="{{ '<li class="py-2"></li>'|e }}"
             data-widget-counter="{{ form.templateQuestions|length }}">
 
+                
+                
                 {% for templateQuestion in form.templateQuestions %}
-                    <li class="w-full py-2">{{ form_row(templateQuestion) }}</li>
+                    <li class="w-full py-2 grid justify-items-center"> 
+                        {{  
+                            form_row(templateQuestion,{
+                                'attr':{
+                                    'class':'block
+                                                w-full
+                                                my-3
+                                                text-base
+                                                font-normal
+                                                text-gray-700
+                                                bg-white bg-clip-padding
+                                                border border-solid border-gray-300
+                                                rounded
+                                                transition
+                                                ease-in-out
+                                                m-0
+                                                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                                    'placeholder':'Tu modelo de plantilla...',
+                                    'rows':'7'
+                                },
+                                'label':'Plantilla de la query que quieres usar:',
+                                'label_attr':{'class':'font-sans text-slate-900'},
+                                'row_attr':{'class' : 'w-full grid justify-items-center bg-slate-100 px-3 rounded-lg py-3'},
+                            })
+                        }}
+                    </li>
                 {% endfor %}
 
             </ul>
