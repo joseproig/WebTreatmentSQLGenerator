@@ -3,6 +3,8 @@
 namespace App\Logic;
 use Symfony\Component\HttpClient\HttpClient;
 use App\Entity\Question;
+use App\Entity\RestAPIEntities\ResponseEntities\PossibleQueries;
+use App\Entity\RestAPIEntities\ResponseEntities\ResponseOfAPI;
 use App\Entity\RestAPIEntities\SendEntities\FilterParamsRestAPI;
 use App\Entity\RestAPIEntities\SendEntities\QuestionToSendToRestAPI;
 use App\Entity\RestAPIEntities\SendEntities\TemplateQuestion;
@@ -22,7 +24,7 @@ class RestAPIController
         $this->client = HttpClient::create();
     }
 
-    public function getPossibilities(Question $question): ResponseInterface
+    public function getPossibilities(Question $question): ResponseOfAPI
     {
         $filterParamsRestApi = new FilterParamsRestAPI();
         foreach ($question->getTemplateQuestions() as $questionTemplate){
@@ -46,6 +48,13 @@ class RestAPIController
             'body' => $formData->bodyToIterable(),
         ]);
 
-        return $response;
+        if ($response->getStatusCode() == 200) {
+            $responseAdaptedObject = $serializer->deserialize($response->getContent(), PossibleQueries::class, 'json');
+            $responseOfAPI = new ResponseOfAPI($responseAdaptedObject,$response->getStatusCode());
+        } else {
+            $responseOfAPI = new ResponseOfAPI(null,$response->getStatusCode());
+        }
+
+        return $responseOfAPI;
     }
 }

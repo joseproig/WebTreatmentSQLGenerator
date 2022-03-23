@@ -52,11 +52,17 @@ class GenerateQueryController extends AbstractController
                 $restAPIController = new RestAPIController();
                 $question->setPathToDBFile($pathDirectory . '/' . $fileName);
                 
-                $responseToPetition = $restAPIController->getPossibilities($question);
-                var_dump($responseToPetition);
-                //if ($responseToPetition->getStatusCode() == 200) {
+    
 
-                //} 
+                $responseToPetition = $restAPIController->getPossibilities($question);
+                
+                //var_dump($responseToPetition->getResponse()->getPossibleQueries()[0]);
+
+                if ($responseToPetition->getStatusCode() == 200) {
+                    return $this->renderForm("managegeneratedqueries.html.twig",[
+                        'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries()[0],
+                    ]);
+                } 
 
             } else {
                 $errorInFile = true;
