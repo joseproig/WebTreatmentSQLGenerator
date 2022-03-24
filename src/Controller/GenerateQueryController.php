@@ -56,11 +56,11 @@ class GenerateQueryController extends AbstractController
 
                 $responseToPetition = $restAPIController->getPossibilities($question);
                 
-                //var_dump($responseToPetition->getResponse()->getPossibleQueries()[0]);
+                
 
                 if ($responseToPetition->getStatusCode() == 200) {
                     return $this->renderForm("managegeneratedqueries.html.twig",[
-                        'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries()[0],
+                        'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
                     ]);
                 } 
 
