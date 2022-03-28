@@ -2,28 +2,34 @@
 
 namespace App\Controller;
 
-use App\Entity\Question;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\QuestionFormType;
+use App\Entity\Project;
+use App\Form\ProjectFormType;
 use Symfony\Component\HttpFoundation\Request;
-use App\Logic\RestAPIController;
 use DateTime;
 
-class GenerateQueryController extends AbstractController
+class ProjectsController extends AbstractController
 {
+    #[Route('/projects', name: 'app_projects')]
+    public function index(): Response
+    {
+        return $this->render('projects/index.html.twig', [
+            'controller_name' => 'ProjectsController',
+        ]);
+    }
+
     const EXTENSION_OF_SQLITE = 'db';
 
-    #[Route('/generatequery', name: 'app_generate_query')]
+    #[Route('/projects/newproject', name: 'app_newproject')]
     public function generateQuery(Request $request): Response
     {
-        $query = new Question();
+        $project = new Project();
         //Generem el formulari
-        $form = $this->createForm(QuestionFormType::class,$query);
+        $form = $this->createForm(ProjectFormType::class,$project);
         
         $errorInFile = false;
-        $errorInTemplate = false;
 
         //Obtenim la petició
         $form->handleRequest($request);
@@ -31,7 +37,7 @@ class GenerateQueryController extends AbstractController
     
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
-            $question = $form->getData();
+            $project = $form->getData();
             $fileDB = $form->get('pathToDbFile')->getData();
             
             $extension = $fileDB->getClientOriginalExtension();
@@ -45,28 +51,15 @@ class GenerateQueryController extends AbstractController
                     $pathDirectory,
                     $fileName
                 );
-                $restAPIController = new RestAPIController();
-                $question->setPathToDBFile($pathDirectory . '/' . $fileName);
-                
-    
-
-                $responseToPetition = $restAPIController->getPossibilities($question);
-                
-                
-
-                if ($responseToPetition->getStatusCode() == 200) {
-                    return $this->renderForm("managegeneratedqueries.html.twig",[
-                        'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
-                    ]);
-                } 
-
+                $project->setPathToDBFile($pathDirectory . '/' . $fileName);
             } else {
                 $errorInFile = true;
             }
             
+            return $this->redirectToRoute('app_newproject');
         }
 
-        return $this->renderForm("generatequerymenu.html.twig",[
+        return $this->renderForm("projects/newprojectform.html.twig",[
             'form' => $form,
             'errorInFile'=>$errorInFile
         ]);

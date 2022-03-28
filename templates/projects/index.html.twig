@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ProjectsController!{% endblock %}
+
+{% block body %}
+
+<div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
+    <h1 class="text-center mt-1 text-4xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
+</div> 
+<div class="h-screen flex flex-col items-center justify-center">
+
+  
+  <h1 class="text-gray-200 text-5xl">
+    Selecciona un proyecto
+  </h1>
+
+  <!-- Profiles -->
+  <div class="flex flex-row wrap gap-5 mt-8 basis-1/5 grow wrap">
+
+    <!-- Profile 1 -->
+    <a href="#" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+      <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 21-22 </p>
+    </a>
+
+    <!-- Profile 2 -->
+    <a href="#" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+      <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 20-21 </p>
+    </a>
+
+    <!-- Profile 3 -->
+    <a href="#" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+      <p class="text-gray-500 group-hover:text-gray-300"> Project AC4 DB 21-22 </p>
+    </a>
+
+    <!-- Profile 4 -->
+    <a href="#" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+      <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
+    </a>
+
+    <a href="#" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+      <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
+    </a>
+
+  
+  
+    <!-- Add Profile -->
+    <a href="projects/newproject" class="flex flex-col items-center group gap-3 ">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-[150px] w-[150px] group-hover:bg-gray-300 border-2 border-transparent" viewBox="0 0 20 20" fill="#6b7280">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+      </svg>
+      <p class="text-gray-500 group-hover:text-gray-300"> Crear Proyecto </p>
+    </a>
+
+  </div>
+
+</div>
+{% endblock %}

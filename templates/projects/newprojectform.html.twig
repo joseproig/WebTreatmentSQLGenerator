@@ -1,0 +1,104 @@
+{% extends "base.html.twig" %}
+
+
+
+{% block body %}
+    <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
+        <h1 class="text-center mt-1 text-4xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
+    </div>
+
+    <div class="mb-5 py-3">
+        {{form_start(form)}}
+            <div class="flex justify-items-center grid w-full h-full">
+                {{form_row(form.name,{
+                    'attr':{
+                        'class':'block
+                        px-3
+                        py-1
+                        mt-2
+                        text-base
+                        font-normal
+                        text-gray-700
+                        bg-white bg-clip-padding
+                        border border-solid border-gray-300
+                        rounded',
+                        'size':'30'
+                    },
+                    'label_attr':{'class':'font-sans text-white'},
+                    'row_attr':{'class':'grid justify-items-center pt-10'} 
+                })}} 
+
+                {% if errorInFile %}
+                    {{ form_row(form.pathToDbFile, { 'attr': {'class': 'block
+                                px-3
+                                py-1
+                                mt-2
+                                text-base
+                                font-normal
+                                bg-transparent bg-clip-padding
+                                border border-solid border-red-700
+                                rounded
+                                m-0
+                                text-red-700
+                                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'},
+                                'help' : 'Se ha introducido un formato de fichero que no es válido',
+                                'help_attr': {'class': 'font-sans text-red-700'},
+                                'label_attr':{'class':'font-sans text-white'},
+                                'row_attr':{'class':'py-5 grid justify-items-center'} 
+
+                    }) }}
+                {% else %}
+                    {{ form_row(form.pathToDbFile,{
+                        'attr':{
+                            'class':'block
+                            px-3
+                            py-1
+                            mt-2
+                            text-base
+                            font-normal
+                            bg-transparent bg-clip-padding
+                            border border-solid border-gray-300
+                            rounded
+                            m-0
+                            text-white
+                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
+                        },
+                        'label_attr':{'class':'font-sans text-white'},
+                        'row_attr':{'class':'py-5 grid justify-items-center'} 
+                    }) }}
+                {% endif %}
+                
+                
+
+                {{form_row(form.description, {
+                    'attr':{
+                        'class':'block
+                                    my-3
+                                    px-2
+                                    py-1
+                                    text-base
+                                    font-normal
+                                    text-gray-700
+                                    bg-white bg-clip-padding
+                                    border border-solid border-gray-300
+                                    rounded
+                                    transition
+                                    ease-in-out
+                                    m-0
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                        'placeholder':'Describe aqui tu proyecto...',
+                        'rows':'10',
+                        'cols':'50'
+                    },
+                    'label_attr':{'class':'font-sans text-slate-100'},
+                    'row_attr':{'class' : 'w-full grid justify-items-center  px-3  mb-5 py-3'},
+                })}}
+
+                
+                <button type="submit" class="bg-transparent w-1/6 text-red-500 hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded">
+                    Crear proyecto
+                </button>
+            </div>
+        {{form_end(form)}}
+    </div>
+{% endblock %}
