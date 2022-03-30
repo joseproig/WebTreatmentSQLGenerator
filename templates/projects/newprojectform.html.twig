@@ -1,15 +1,62 @@
 {% extends "base.html.twig" %}
+{% form_theme form _self %}
 
-
+{% block _project_form_custom_logo_label  %}
+   <label for="file-input" class="py-0 font-sans text-white flex justify-items-center grid">
+        Logo (Opt.):
+        <img id="previewLogoImage" alt="Preview of the image" src={{ asset('build/images/databaseIcon.8765e8fe.png')}} width="60" height="60" />
+   </label>
+{% endblock %} 
 
 {% block body %}
     <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
         <h1 class="text-center mt-1 text-4xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
     </div>
 
-    <div class="mb-5 py-3">
+    <div class="mb-5 py-5">
         {{form_start(form)}}
             <div class="flex justify-items-center grid w-full h-full">
+
+                {% if errorInImage %}     
+                    <div class="border border-solid border-red-800 justify-items-center grid rounded px-3 py-1">
+                        {{ form_row(form.pathToLogo,{
+                                "id":"file-input",
+                                'attr':{
+                                    'class':'block
+                                    px-3
+                                    text-base
+                                    font-normal
+                                    bg-transparent bg-clip-padding
+                                    m-0
+                                    text-white
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                                    "onchange":"document.getElementById('previewLogoImage').src = window.URL.createObjectURL(this.files[0])",
+                                    "style":"display:none"
+                                },
+                                'row_attr':{'class':'pt-2 grid justify-items-center'} 
+                        }) }}
+                    </div>
+                {% else %}
+                    <div class="border border-solid border-gray-300 justify-items-center grid rounded px-3 py-1">
+                        {{ form_row(form.pathToLogo,{
+                                "id":"file-input",
+                                'attr':{
+                                    'class':'block
+                                    px-3
+                                    text-base
+                                    font-normal
+                                    bg-transparent bg-clip-padding
+                                    m-0
+                                    text-white
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                                    "onchange":"document.getElementById('previewLogoImage').src = window.URL.createObjectURL(this.files[0])",
+                                    "style":"display:none"
+                                },
+                                'row_attr':{'class':'pt-2 grid justify-items-center'} 
+                        }) }}
+                    </div>
+                {% endif %}
+
                 {{form_row(form.name,{
                     'attr':{
                         'class':'block
@@ -25,7 +72,7 @@
                         'size':'30'
                     },
                     'label_attr':{'class':'font-sans text-white'},
-                    'row_attr':{'class':'grid justify-items-center pt-10'} 
+                    'row_attr':{'class':'grid justify-items-center pt-5'} 
                 })}} 
 
                 {% if errorInFile %}

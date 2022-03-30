@@ -15,6 +15,11 @@ class ProjectFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('pathToLogo', FileType::class, [
+                'label'    => 'Logo (Optional)',
+                'block_name' => 'custom_logo',
+                'required'   => false,
+            ])
             ->add('pathToDbFile', FileType::class, [
                 'label'    => 'Base de datos (.db):'
             ])
@@ -23,8 +28,7 @@ class ProjectFormType extends AbstractType
             ])
             ->add('description', TextareaType::class,[
                 'label'    => 'Descripcion del proyecto'
-            ]
-            )
+            ])
         ;
     }
 

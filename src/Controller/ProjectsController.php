@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Project;
 use App\Form\ProjectFormType;
 use Symfony\Component\HttpFoundation\Request;
+use App\Logic\UtilsFunctions;
 use DateTime;
 
 class ProjectsController extends AbstractController
@@ -20,7 +21,11 @@ class ProjectsController extends AbstractController
         ]);
     }
 
-    const EXTENSION_OF_SQLITE = 'db';
+    const EXTENSION_OF_PNG = 'png';
+    const EXTENSION_OF_JPG = 'jpg';
+    const EXTENSION_OF_JPEG = 'jpeg';
+    const EXTENSION_OF_DB = 'db';
+
 
     #[Route('/projects/newproject', name: 'app_newproject')]
     public function generateQuery(Request $request): Response
@@ -30,6 +35,7 @@ class ProjectsController extends AbstractController
         $form = $this->createForm(ProjectFormType::class,$project);
         
         $errorInFile = false;
+        $errorInImage = false;
 
         //Obtenim la petició
         $form->handleRequest($request);
@@ -38,30 +44,46 @@ class ProjectsController extends AbstractController
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
             $project = $form->getData();
+
+            $logoFile = $form->get('pathToLogo')->getData();
+            //Mirem si es vol utilitzar el logo per defecte
+            if ($logoFile != null) {
+                //Movem fitxer al servidor, sols si té la extensió .db que es la que llegeix el servidor
+                $extension = $logoFile->getClientOriginalExtension();
+                if ((strcmp($extension,self::EXTENSION_OF_PNG) == 0 || strcmp($extension,self::EXTENSION_OF_JPG) == 0 || strcmp($extension,self::EXTENSION_OF_JPEG) == 0)) {
+                    $project->setPathToLogo(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'),$logoFile,$extension, 'images'));
+                } else {
+                    $errorInImage = true;
+                }
+            } else {
+                $project->setPathToLogo($this->getParameter('kernel.project_dir') . '/public/build/images/' . 'databaseIcon.8765e8fe.png');
+            }
+
             $fileDB = $form->get('pathToDbFile')->getData();
-            
             $extension = $fileDB->getClientOriginalExtension();
-            //Movem fitxer al servidor, sols si té la extensió .db que es la que llegeix el servidor
-            if (strcmp($extension,self::EXTENSION_OF_SQLITE) == 0) {
-                //Agafem la datetime per a ficar-li el nom al fitxer que es moura al servidor
-                $d1 = new Datetime();
-                $fileName =  $d1->format('U') . '.' . $extension;
-                $pathDirectory = $this->getParameter('kernel.project_dir') . '/public/dbs'; 
-                $fileDB -> move(
-                    $pathDirectory,
-                    $fileName
-                );
-                $project->setPathToDBFile($pathDirectory . '/' . $fileName);
+            if (strcmp($extension,self::EXTENSION_OF_DB) == 0) {
+                $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'),$fileDB,$extension, 'dbs'));
             } else {
                 $errorInFile = true;
             }
             
-            return $this->redirectToRoute('app_newproject');
+            //Si no hi ha errors de cap tipus, tornem a la pàgina de projectes
+            if (!$errorInFile && !$errorInImage) {
+                return $this->redirectToRoute("app_projects");
+            }
         }
 
         return $this->renderForm("projects/newprojectform.html.twig",[
             'form' => $form,
-            'errorInFile'=>$errorInFile
+            'errorInFile'=>$errorInFile,
+            'errorInImage'=>$errorInImage
+        ]);
+    }
+
+    #[Route('/projects/info/{id}', name: 'app_project_info')]
+    public function projectInfo($id): Response
+    {
+        return $this->render('projects/projectDetails.html.twig', [
         ]);
     }
 

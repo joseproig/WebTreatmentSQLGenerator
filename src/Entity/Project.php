@@ -9,6 +9,8 @@ class Project
 
     
 
+    private $pathToLogo;
+
     private $pathToDbFile;
 
     private $name;
@@ -91,6 +93,26 @@ class Project
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of pathToLogo
+     */ 
+    public function getPathToLogo()
+    {
+        return $this->pathToLogo;
+    }
+
+    /**
+     * Set the value of pathToLogo
+     *
+     * @return  self
+     */ 
+    public function setPathToLogo($pathToLogo)
+    {
+        $this->pathToLogo = $pathToLogo;
 
         return $this;
     }

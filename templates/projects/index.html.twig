@@ -1,48 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProjectsController!{% endblock %}
 
 {% block body %}
 
 <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
-    <h1 class="text-center mt-1 text-4xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
+    <h1 class="text-center mt-1 text-2xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
 </div> 
-<div class="h-screen flex flex-col items-center justify-center">
+<div class="h-full flex flex-col items-center justify-center">
 
   
-  <h1 class="text-gray-200 text-5xl">
+  <h1 class="text-gray-200 text-2xl mt-10">
     Selecciona un proyecto
   </h1>
 
   <!-- Profiles -->
-  <div class="flex flex-row wrap gap-5 mt-8 basis-1/5 grow wrap">
+  <div class="flex flex-row gap-x-8 gap-y-10 mt-8 basis-1/5 grow justify-center grid md:grid-cols-3 lg:grid-cols-4">
 
     <!-- Profile 1 -->
-    <a href="#" class="flex flex-col items-center group gap-2">
-      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+    <a href="projects/info/1" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
       <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 21-22 </p>
     </a>
 
     <!-- Profile 2 -->
-    <a href="#" class="flex flex-col items-center group gap-2">
-      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+    <a href="projects/info/2" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
       <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 20-21 </p>
     </a>
 
     <!-- Profile 3 -->
-    <a href="#" class="flex flex-col items-center group gap-2">
-      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+    <a href="projects/info/3" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
       <p class="text-gray-500 group-hover:text-gray-300"> Project AC4 DB 21-22 </p>
     </a>
 
     <!-- Profile 4 -->
-    <a href="#" class="flex flex-col items-center group gap-2">
-      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+    <a href="projects/info/4" class="flex flex-col items-center group gap-2">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
       <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
     </a>
 
-    <a href="#" class="flex flex-col items-center group gap-2">
-      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/256/database-icon.png" />
+    <a href="projects/info/5" class="flex flex-col items-center group gap-2 ">
+      <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
       <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
     </a>
 
