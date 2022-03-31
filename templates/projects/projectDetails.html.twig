@@ -2,57 +2,90 @@
 
 
 {% block body %}
+    <div class="container mx-auto">
+        <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
+            <h1 class="text-center mt-1 text-2xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
+        </div> 
+        <div class="w-full px-6">
+            <div class=" mt-8 mx-12 text-4xl font-extrabold text-white">
+                Proyecto {{idProject}}
+            </div>
 
-    <div class="flex flex-col justify-center text-transparent bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text">
-        <h1 class="text-center mt-1 text-2xl font-extrabold uppercase tracking-tighest sm:text-5xl lg:text-7xl">GENERADOR DE QUERIES</h1>
-    </div> 
-    <div class="w-full px-6">
-        <div class="flex flex-row gap-y-10 mt-8 basis-1/5 grow justify-center justify-items-center  grid md:grid-cols-2 lg:grid-cols-3">
+            <div class=" mt-2 mb-2 mx-12 text-xl text-white">
+                Esta es la AC4 del curso 21/22, donde los alumnos trabajaran los where mas básicos
+            </div>
 
-            <!-- Card -->
-            <card class="bg-slate-200  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
-                <!-- Header & Price -->
-                <p class="text-3xl text-gray-700 font-semibold"> Template 1 </p>
-                <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
-            
-
-                <!-- Description -->
-                <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
-
-                <!-- CTA Button -->
-                <button class=" bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 mt-10 w-full py-3 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-gray-50">
-                Editar Template
+            <div class=" mt-8 mx-12 text-4xl font-extrabold text-white flex align-center">
+                Templates
+                <button class=" bg-red-500 mx-4 px-2 py-1 text-base rounded-xl border border-white-600 text-white-600 hover:bg-white hover:text-red-50">
+                    Crear Nueva Template
                 </button>
-            </card>
-            <card class="bg-slate-200  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
-                <!-- Header & Price -->
-                <p class="text-3xl text-gray-700 font-semibold"> Template 2 </p>
-                <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
-            
+            </div>
 
-                <!-- Description -->
-                <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
+            <div class="mx-8 mt-10 flex flex-row gap-y-10 basis-1/5 grow justify-between justify-items-center  grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
 
-                <!-- CTA Button -->
-                <button class=" bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 mt-10 w-full py-3 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-gray-50">
-                Editar Template
-                </button>
-            </card>
+                <!-- Card -->
+                <card class="bg-slate-300  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
+                    <!-- Header & Price -->
+                    <p class="text-3xl text-gray-700 font-semibold"> Template 1 </p>
+                    <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
+                
 
-            <card class="bg-slate-200  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
-                <!-- Header & Price -->
-                <p class="text-3xl text-gray-700 font-semibold"> Template 3 </p>
-                <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
-            
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
 
-                <!-- Description -->
-                <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
+                    <!-- CTA Button -->
+                    <button class=" bg-transparent mt-10 w-full py-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
+                    Editar Template
+                    </button>
+                </card>
+                <!-- Card -->
+                <card class="bg-slate-300 w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
+                    <!-- Header & Price -->
+                    <p class="text-3xl text-gray-700 font-semibold"> Template 2 </p>
+                    <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
+                
 
-                <!-- CTA Button -->
-                <button class=" bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 mt-10 w-full py-3 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-gray-50">
-                Editar Template
-                </button>
-            </card>
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
+
+                    <!-- CTA Button -->
+                    <button class=" bg-transparent mt-10 w-full py-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
+                    Editar Template
+                    </button>
+                </card>
+
+                <card class="bg-slate-300  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
+                    <!-- Header & Price -->
+                    <p class="text-3xl text-gray-700 font-semibold"> Template 3 </p>
+                    <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
+                
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
+
+                    <!-- CTA Button -->
+                    <button class=" bg-transparent mt-10 w-full py-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
+                    Editar Template
+                    </button>
+                </card>
+
+                <!-- Card -->
+                <card class="bg-slate-300  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
+                    <!-- Header & Price -->
+                    <p class="text-3xl text-gray-700 font-semibold"> Template 4 </p>
+                    <p class="text-xl text-gray-700 font-semibold mt-1"> Josep Roig Torres </p>
+                
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 font-light mt-5 leading-7"> Query para preparar a los alumnos sobre el Group By y los Wheres </p>
+
+                    <!-- CTA Button -->
+                    <button class=" bg-transparent mt-10 w-full py-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
+                    Editar Template
+                    </button>
+                </card>
+            </div>
         </div>
     </div>
 {% endblock %}

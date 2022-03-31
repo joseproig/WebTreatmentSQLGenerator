@@ -3,13 +3,11 @@
 namespace App\Entity;
 
 
-class Project 
+class Project
 {
     private $id;
 
-    
 
-    private $pathToLogo;
 
     private $pathToDbFile;
 
@@ -19,7 +17,7 @@ class Project
 
     /**
      * Get the value of pathToDbFile
-     */ 
+     */
     public function getPathToDbFile()
     {
         return $this->pathToDbFile;
@@ -29,7 +27,7 @@ class Project
      * Set the value of pathToDbFile
      *
      * @return  self
-     */ 
+     */
     public function setPathToDbFile($pathToDbFile)
     {
         $this->pathToDbFile = $pathToDbFile;
@@ -39,7 +37,7 @@ class Project
 
     /**
      * Get the value of name
-     */ 
+     */
     public function getName()
     {
         return $this->name;
@@ -49,7 +47,7 @@ class Project
      * Set the value of name
      *
      * @return  self
-     */ 
+     */
     public function setName($name)
     {
         $this->name = $name;
@@ -59,7 +57,7 @@ class Project
 
     /**
      * Get the value of description
-     */ 
+     */
     public function getDescription()
     {
         return $this->description;
@@ -69,7 +67,7 @@ class Project
      * Set the value of description
      *
      * @return  self
-     */ 
+     */
     public function setDescription($description)
     {
         $this->description = $description;
@@ -79,7 +77,7 @@ class Project
 
     /**
      * Get the value of id
-     */ 
+     */
     public function getId()
     {
         return $this->id;
@@ -89,32 +87,11 @@ class Project
      * Set the value of id
      *
      * @return  self
-     */ 
+     */
     public function setId($id)
     {
         $this->id = $id;
 
         return $this;
     }
-
-    /**
-     * Get the value of pathToLogo
-     */ 
-    public function getPathToLogo()
-    {
-        return $this->pathToLogo;
-    }
-
-    /**
-     * Set the value of pathToLogo
-     *
-     * @return  self
-     */ 
-    public function setPathToLogo($pathToLogo)
-    {
-        $this->pathToLogo = $pathToLogo;
-
-        return $this;
-    }
 }
-

@@ -27,7 +27,7 @@ class ProjectsController extends AbstractController
     const EXTENSION_OF_DB = 'db';
 
 
-    #[Route('/projects/newproject', name: 'app_newproject')]
+    #[Route('/projects/create', name: 'app_newproject')]
     public function generateQuery(Request $request): Response
     {
         $project = new Project();
@@ -80,10 +80,11 @@ class ProjectsController extends AbstractController
         ]);
     }
 
-    #[Route('/projects/info/{id}', name: 'app_project_info')]
+    #[Route('/projects/{id}', name: 'app_project_info')]
     public function projectInfo($id): Response
     {
         return $this->render('projects/projectDetails.html.twig', [
+            'idProject' => $id
         ]);
     }
 
