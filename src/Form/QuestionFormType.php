@@ -16,15 +16,12 @@ class QuestionFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('pathToDbFile', FileType::class, [
-            'label'    => 'Introduce el fichero de base de datos sobre el que quieres realizar queries:'
-        ])
-        ->add('templateQuestions', CollectionType::class, [
-            'entry_type' => TextareaType::class,
-            'allow_add' => true,
-            'entry_options' => array('label' => false),
-            'label' => false
-        ]);
+            ->add('templateQuestions', CollectionType::class, [
+                'entry_type' => TextareaType::class,
+                'allow_add' => true,
+                'entry_options' => array('label' => false),
+                'label' => false
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

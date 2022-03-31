@@ -4,18 +4,18 @@
 {% block _project_form_path_to_db_widget  %}
     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
         <div class="space-y-1 text-center">
-            <svg class="mx-auto h-12 w-12 text-white" stroke="currentColor" fill="none" viewbox="0 0 48 48" aria-hidden="true">
-                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg class="mx-auto h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <div class="flex text-sm text-gray-600">
                 <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                    <span class="">Upload a file</span>
+                    <span class="px-2 py-2">Upload a file</span>
                     <input id="file-upload" name="file-upload" type="file" class="sr-only">
                 </label>
                 <p class="pl-1 text-white">or drag and drop</p>
             </div>
             <p class="text-xs text-white">
-                PNG, JPG, GIF up to 10MB
+                .DB up to 10MB
             </p>
         </div>
     </div>
@@ -36,17 +36,9 @@
 
                     {{form_row(form.name,{
                                 'attr':{
-                                    'class':'block
-                                    px-3
-                                    py-1
-                                    mt-2
-                                    text-base
-                                    font-normal
-                                    text-gray-700
-                                    bg-white bg-clip-padding
-                                    border border-solid border-gray-300
-                                    rounded',
-                                    'size':'30'
+                                    'class':'mt-3 bg-gray-200 shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3',
+                                    'size':'30',
+                                    'placeholder':'Titula tu proyecto...'
                                 },
                                 'label_attr':{'class':'font-sans text-white'},
                                 'row_attr':{'class':'grid justify-items-center pt-5'} 
@@ -55,20 +47,7 @@
                     
                     {{form_row(form.description, {
                         'attr':{
-                            'class':'block
-                                        my-3
-                                        px-2
-                                        py-1
-                                        text-base
-                                        font-normal
-                                        text-gray-700
-                                        bg-white bg-clip-padding
-                                        border border-solid border-gray-300
-                                        rounded
-                                        transition
-                                        ease-in-out
-                                        m-0
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none',
+                            'class':'mt-3 bg-gray-200 shadow appearance-none border border-red rounded py-2 px-3 text-grey-darker mb-3',
                             'placeholder':'Describe aqui tu proyecto...',
                             'rows':'10',
                             'cols':'50'

@@ -6,7 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Project;
+use App\Entity\Question;
+use App\Logic\RestAPIController;
 use App\Form\ProjectFormType;
+use App\Form\QuestionFormType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Logic\UtilsFunctions;
 use DateTime;
@@ -28,55 +31,36 @@ class ProjectsController extends AbstractController
 
 
     #[Route('/projects/create', name: 'app_newproject')]
-    public function generateQuery(Request $request): Response
+    public function createProject(Request $request): Response
     {
         $project = new Project();
         //Generem el formulari
-        $form = $this->createForm(ProjectFormType::class,$project);
-        
+        $form = $this->createForm(ProjectFormType::class, $project);
+
         $errorInFile = false;
-        $errorInImage = false;
 
         //Obtenim la petició
         $form->handleRequest($request);
 
-    
+
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
             $project = $form->getData();
 
-            $logoFile = $form->get('pathToLogo')->getData();
-            //Mirem si es vol utilitzar el logo per defecte
-            if ($logoFile != null) {
-                //Movem fitxer al servidor, sols si té la extensió .db que es la que llegeix el servidor
-                $extension = $logoFile->getClientOriginalExtension();
-                if ((strcmp($extension,self::EXTENSION_OF_PNG) == 0 || strcmp($extension,self::EXTENSION_OF_JPG) == 0 || strcmp($extension,self::EXTENSION_OF_JPEG) == 0)) {
-                    $project->setPathToLogo(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'),$logoFile,$extension, 'images'));
-                } else {
-                    $errorInImage = true;
-                }
-            } else {
-                $project->setPathToLogo($this->getParameter('kernel.project_dir') . '/public/build/images/' . 'databaseIcon.8765e8fe.png');
-            }
 
             $fileDB = $form->get('pathToDbFile')->getData();
             $extension = $fileDB->getClientOriginalExtension();
-            if (strcmp($extension,self::EXTENSION_OF_DB) == 0) {
-                $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'),$fileDB,$extension, 'dbs'));
+            if (strcmp($extension, self::EXTENSION_OF_DB) == 0) {
+                $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'), $fileDB, $extension, 'dbs'));
+                return $this->redirectToRoute("app_projects");
             } else {
                 $errorInFile = true;
             }
-            
-            //Si no hi ha errors de cap tipus, tornem a la pàgina de projectes
-            if (!$errorInFile && !$errorInImage) {
-                return $this->redirectToRoute("app_projects");
-            }
         }
 
-        return $this->renderForm("projects/newprojectform.html.twig",[
+        return $this->renderForm("projects/newprojectform.html.twig", [
             'form' => $form,
-            'errorInFile'=>$errorInFile,
-            'errorInImage'=>$errorInImage
+            'errorInFile' => $errorInFile
         ]);
     }
 
@@ -88,4 +72,47 @@ class ProjectsController extends AbstractController
         ]);
     }
 
+    #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
+    public function generateQuery(Request $request): Response
+    {
+        $query = new Question();
+        //Generem el formulari
+        $form = $this->createForm(QuestionFormType::class, $query);
+
+        $errorInFile = false;
+        $errorInTemplate = false;
+
+        //Obtenim la petició
+        $form->handleRequest($request);
+
+
+        //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+        if ($form->isSubmitted() && $form->isValid()) {
+            $question = $form->getData();
+            //TODO: File of the project
+            $fileDB = null;
+
+
+
+
+            $restAPIController = new RestAPIController();
+
+
+
+            $responseToPetition = $restAPIController->getPossibilities($question);
+
+
+
+            if ($responseToPetition->getStatusCode() == 200) {
+                return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+                    'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
+                ]);
+            }
+        }
+
+        return $this->renderForm("projects/templates/createnewtemplates.html.twig", [
+            'form' => $form,
+            'errorInFile' => $errorInFile
+        ]);
+    }
 }

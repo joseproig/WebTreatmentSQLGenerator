@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Logic;
+
 use Symfony\Component\HttpClient\HttpClient;
 use App\Entity\Question;
 use App\Entity\RestAPIEntities\ResponseEntities\PossibleQueries;
@@ -27,7 +28,7 @@ class RestAPIController
     public function getPossibilities(Question $question): ResponseOfAPI
     {
         $filterParamsRestApi = new FilterParamsRestAPI();
-        foreach ($question->getTemplateQuestions() as $questionTemplate){
+        foreach ($question->getTemplateQuestions() as $questionTemplate) {
             $templateQuestion = new TemplateQuestion($questionTemplate);
             $filterParamsRestApi->addQuestion($templateQuestion);
         }
@@ -38,21 +39,21 @@ class RestAPIController
         $serializer = new Serializer($normalizers, $encoders);
 
         $data = [
-            'file' => DataPart::fromPath($question->getPathToDbFile()),
-            'config' =>  $serializer->serialize($questionToSendToRestAPI,'json'),
+            //'file' => DataPart::fromPath($question->getPathToDbFile()),
+            'config' =>  $serializer->serialize($questionToSendToRestAPI, 'json'),
         ];
         $formData = new FormDataPart($data);
 
-        $response = $this->client->request('POST', 'http://localhost:8086/getPossibilities',[
+        $response = $this->client->request('POST', 'http://localhost:8086/getPossibilities', [
             'headers' => $formData->getPreparedHeaders()->toArray(),
             'body' => $formData->bodyToIterable(),
         ]);
 
         if ($response->getStatusCode() == 200) {
             $responseAdaptedObject = $serializer->deserialize($response->getContent(), PossibleQueries::class, 'json');
-            $responseOfAPI = new ResponseOfAPI($responseAdaptedObject,$response->getStatusCode());
+            $responseOfAPI = new ResponseOfAPI($responseAdaptedObject, $response->getStatusCode());
         } else {
-            $responseOfAPI = new ResponseOfAPI(null,$response->getStatusCode());
+            $responseOfAPI = new ResponseOfAPI(null, $response->getStatusCode());
         }
 
         return $responseOfAPI;
