@@ -2,73 +2,71 @@
 
 namespace App\Entity;
 
+use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-
-
+    #[ORM\Column(type: 'string', length: 255)]
     private $pathToDbFile;
 
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
-    /**
-     * Get the value of pathToDbFile
-     */
-    public function getPathToDbFile()
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Question::class)]
+    private $templateQuestions;
+
+    public function __construct()
+    {
+        $this->templateQuestions = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getPathToDbFile(): ?string
     {
         return $this->pathToDbFile;
     }
 
-    /**
-     * Set the value of pathToDbFile
-     *
-     * @return  self
-     */
-    public function setPathToDbFile($pathToDbFile)
+    public function setPathToDbFile(string $pathToDbFile): self
     {
         $this->pathToDbFile = $pathToDbFile;
 
         return $this;
     }
 
-    /**
-     * Get the value of name
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * Set the value of name
-     *
-     * @return  self
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * Get the value of description
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * Set the value of description
-     *
-     * @return  self
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -76,21 +74,31 @@ class Project
     }
 
     /**
-     * Get the value of id
+     * @return Collection<int, Question>
      */
-    public function getId()
+    public function getTemplateQuestions(): Collection
     {
-        return $this->id;
+        return $this->templateQuestions;
     }
 
-    /**
-     * Set the value of id
-     *
-     * @return  self
-     */
-    public function setId($id)
+    public function addTemplateQuestion(Question $templateQuestion): self
     {
-        $this->id = $id;
+        if (!$this->templateQuestions->contains($templateQuestion)) {
+            $this->templateQuestions[] = $templateQuestion;
+            $templateQuestion->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTemplateQuestion(Question $templateQuestion): self
+    {
+        if ($this->templateQuestions->removeElement($templateQuestion)) {
+            // set the owning side to null (unless already changed)
+            if ($templateQuestion->getProject() === $this) {
+                $templateQuestion->setProject(null);
+            }
+        }
 
         return $this;
     }

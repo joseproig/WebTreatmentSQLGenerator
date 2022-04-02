@@ -34,35 +34,14 @@
         <!-- Profiles -->
         <div class="flex flex-row gap-y-10 gap-x-8 text-center mt-8 basis-1/5 grow justify-center grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-          <!-- Profile 1 -->
-          <a href="projects/1" class="flex flex-col items-center group gap-2">
-            <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
-            <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 21-22 </p>
-          </a>
+          {% for project in projects %}
+            <!-- Profile 1 -->
+            <a href="projects/{{ project.id }}" class="flex flex-col items-center group gap-2">
+              <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
+              <p class="text-gray-500 group-hover:text-gray-300"> {{project.name}} </p>
+            </a>
 
-          <!-- Profile 2 -->
-          <a href="projects/2" class="flex flex-col items-center group gap-2">
-            <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
-            <p class="text-gray-500 group-hover:text-gray-300"> Project AC3 DB 20-21 </p>
-          </a>
-
-          <!-- Profile 3 -->
-          <a href="projects/3" class="flex flex-col items-center group gap-2">
-            <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
-            <p class="text-gray-500 group-hover:text-gray-300"> Project AC4 DB 21-22 </p>
-          </a>
-
-          <!-- Profile 4 -->
-          <a href="projects/4" class="flex flex-col items-center group gap-2">
-            <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
-            <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
-          </a>
-
-          <a href="projects/5" class="flex flex-col items-center group gap-2 ">
-            <img class="h-[150px] w-[150px] rounded border-2 border-transparent group-hover:border-2 group-hover:border-gray-300" src="{{ asset('build/images/databaseIcon.8765e8fe.png')}}" />
-            <p class="text-gray-500 group-hover:text-gray-300"> Project AC5 DB 21-22  </p>
-          </a>
-
+          {% endfor %}
         
         
           <!-- Add Profile -->

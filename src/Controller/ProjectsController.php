@@ -13,14 +13,26 @@ use App\Form\QuestionFormType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Logic\UtilsFunctions;
 use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectsController extends AbstractController
 {
+
+    private $entmanager;
+
+    public function __construct(EntityManagerInterface $entmanager)
+    {
+        $this->entmanager = $entmanager;
+    }
+
     #[Route('/projects', name: 'app_projects')]
     public function index(): Response
     {
+        $projectManager = $this->entmanager->getRepository(Project::class);
+        $projects = $projectManager->findAll();
         return $this->render('projects/index.html.twig', [
-            'controller_name' => 'ProjectsController',
+            'projects' => $projects,
         ]);
     }
 
@@ -67,15 +79,18 @@ class ProjectsController extends AbstractController
     #[Route('/projects/{id}', name: 'app_project_info')]
     public function projectInfo($id): Response
     {
+        $projectManager = $this->entmanager->getRepository(Project::class);
+        $project = $projectManager->findOneBy(['id' => $id], []);
+
         return $this->render('projects/projectDetails.html.twig', [
-            'idProject' => $id
+            'project' => $project
         ]);
     }
 
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
     public function generateQuery(Request $request): Response
     {
-        $query = new Question();
+        $query = new Project();
         //Generem el formulari
         $form = $this->createForm(QuestionFormType::class, $query);
 
