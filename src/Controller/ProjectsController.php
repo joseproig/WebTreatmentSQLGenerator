@@ -7,13 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Project;
 use App\Entity\Question;
+use App\Entity\User;
 use App\Logic\RestAPIController;
 use App\Form\ProjectFormType;
 use App\Form\QuestionFormType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Logic\UtilsFunctions;
-use DateTime;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectsController extends AbstractController
@@ -58,12 +57,12 @@ class ProjectsController extends AbstractController
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
             $project = $form->getData();
-
-
             $fileDB = $form->get('pathToDbFile')->getData();
             $extension = $fileDB->getClientOriginalExtension();
             if (strcmp($extension, self::EXTENSION_OF_DB) == 0) {
                 $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'), $fileDB, $extension, 'dbs'));
+                $this->entmanager->persist($project);
+                $this->entmanager->flush();
                 return $this->redirectToRoute("app_projects");
             } else {
                 $errorInFile = true;
@@ -88,37 +87,44 @@ class ProjectsController extends AbstractController
     }
 
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
-    public function generateQuery(Request $request): Response
+    public function generateQuery(Request $request, $id): Response
     {
         $query = new Project();
         //Generem el formulari
         $form = $this->createForm(QuestionFormType::class, $query);
 
         $errorInFile = false;
-        $errorInTemplate = false;
 
         //Obtenim la petició
         $form->handleRequest($request);
 
-
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
-            $question = $form->getData();
-            //TODO: File of the project
-            $fileDB = null;
+            $newQuestions = $form->getData();
+            $projectManager = $this->entmanager->getRepository(Project::class);
+            $project = $projectManager->findOneBy(['id' => $id], []);
+
+            foreach ($newQuestions->getTemplateQuestions() as $newQuestionString) {
+                $question = new Question();
+
+                $userManager = $this->entmanager->getRepository(User::class);
+                $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
+                $question->setCreator($user);
+                $question->setProject($project);
+                $question->setTemplateQuestion($newQuestionString);
 
 
-
+                $project->addTemplateQuestion($question);
+            }
 
             $restAPIController = new RestAPIController();
 
-
-
-            $responseToPetition = $restAPIController->getPossibilities($question);
-
-
+            $responseToPetition = $restAPIController->getPossibilities($project);
 
             if ($responseToPetition->getStatusCode() == 200) {
+                $this->entmanager->persist($project);
+                $this->entmanager->flush();
+
                 return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
                     'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
                 ]);

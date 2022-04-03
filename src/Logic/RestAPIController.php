@@ -4,6 +4,7 @@ namespace App\Logic;
 
 use Symfony\Component\HttpClient\HttpClient;
 use App\Entity\Question;
+use App\Entity\Project;
 use App\Entity\RestAPIEntities\ResponseEntities\PossibleQueries;
 use App\Entity\RestAPIEntities\ResponseEntities\ResponseOfAPI;
 use App\Entity\RestAPIEntities\SendEntities\FilterParamsRestAPI;
@@ -25,11 +26,11 @@ class RestAPIController
         $this->client = HttpClient::create();
     }
 
-    public function getPossibilities(Question $question): ResponseOfAPI
+    public function getPossibilities(Project $project): ResponseOfAPI
     {
         $filterParamsRestApi = new FilterParamsRestAPI();
-        foreach ($question->getTemplateQuestions() as $questionTemplate) {
-            $templateQuestion = new TemplateQuestion($questionTemplate);
+        foreach ($project->getTemplateQuestions() as $questionTemplate) {
+            $templateQuestion = new TemplateQuestion($questionTemplate->getTemplateQuestion());
             $filterParamsRestApi->addQuestion($templateQuestion);
         }
         $questionToSendToRestAPI = new QuestionToSendToRestAPI($filterParamsRestApi);
