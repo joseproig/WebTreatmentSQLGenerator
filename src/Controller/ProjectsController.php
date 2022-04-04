@@ -140,4 +140,17 @@ class ProjectsController extends AbstractController
             'errorInFile' => $errorInFile
         ]);
     }
+
+    #[Route('/projects/{id}/templates/{id_template}/delete', name: 'app_delete_template')]
+    public function deleteTemplate($id, $id_template): Response
+    {
+
+        $questionManager = $this->entmanager->getRepository(Question::class);
+        $question = $questionManager->findOneBy(['id' => $id_template], []);
+
+        $this->entmanager->remove($question);
+        $this->entmanager->flush();
+
+        return $this->redirectToRoute('app_project_info', ['id' => $id]);
+    }
 }

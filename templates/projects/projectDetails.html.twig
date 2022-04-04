@@ -26,15 +26,19 @@
                 {% for question in project.templateQuestions %}
                     <!-- Card -->
                     <card class="bg-slate-300  w-80 rounded-2xl border shadow py-12 px-8 hover:-translate-y-1 hover:shadow-2xl delay-75 duration-100  group gap-2">
-                        <!-- Header & Price -->
                         <p class="text-3xl text-gray-700 font-semibold"> Template {{loop.index}} </p>
+                        <a class="absolute  top-3 right-3  hidden group-hover:block" href="{{ project.id }}/templates/{{ question.id }}/delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
                         <p class="text-xl text-gray-700 font-semibold mt-1"> {{question.creator.name}} </p>
                     
 
                         <!-- Description -->
                         <p class="text-sm text-gray-700 font-light mt-5 leading-7"> {{question.templateQuestion}} </p>
 
-                        <!-- CTA Button -->
+                        <!-- Button -->
                         <button class=" bg-transparent mt-10 w-full py-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
                         Editar Template
                         </button>
