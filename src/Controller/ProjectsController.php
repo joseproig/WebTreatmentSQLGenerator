@@ -153,4 +153,17 @@ class ProjectsController extends AbstractController
 
         return $this->redirectToRoute('app_project_info', ['id' => $id]);
     }
+
+    #[Route('/projects/{id}/delete', name: 'app_delete_project')]
+    public function deleteProject($id): Response
+    {
+
+        $projectManager = $this->entmanager->getRepository(Project::class);
+        $project = $projectManager->find($id);
+
+        $this->entmanager->remove($project);
+        $this->entmanager->flush();
+
+        return $this->redirectToRoute('app_projects');
+    }
 }

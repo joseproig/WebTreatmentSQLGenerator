@@ -24,7 +24,7 @@ class Project
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Question::class, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Question::class, orphanRemoval: 'true', cascade: ['persist'])]
     private $templateQuestions;
 
     public function __construct()

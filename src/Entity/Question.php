@@ -17,7 +17,7 @@ class Question
     private $templateQuestion;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'templateQuestions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private $project;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questions')]
