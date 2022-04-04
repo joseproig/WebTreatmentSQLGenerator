@@ -33,23 +33,23 @@
 
                         
                         
-                        {% for templateQuestion in form.templateQuestions %}
-                            <li class="w-full py-2 grid justify-items-center"> 
-                                {{  
-                                    form_row(templateQuestion,{
-                                        'attr':{
-                                            'class':'mt-3 bg-gray-200 shadow appearance-none border border-red rounded py-2 px-3 text-grey-darker mb-3',
-                                            'placeholder':'Escribe aqui tu plantilla de query...',
-                                            'rows':'10',
-                                            'cols':'50'
-                                        },
-                                        'label_attr':{'class':'font-sans text-slate-100'},
-                                        'row_attr':{'class' : 'w-full grid justify-items-center  px-3 pt-5'},
-                                        'label':'Plantilla de una nueva template:'
-                                    })
-                                }}
-                            </li>
-                        {% endfor %}
+                    {% for templateQuestion in form.templateQuestions %}
+                        <li class="w-full py-2 grid justify-items-center"> 
+                            {{  
+                                form_row(templateQuestion,{
+                                    'attr':{
+                                        'class':'mt-3 bg-gray-200 shadow appearance-none border border-red rounded py-2 px-3 text-grey-darker mb-3',
+                                        'placeholder':'Escribe aqui tu plantilla de query...',
+                                        'rows':'10',
+                                        'cols':'50'
+                                    },
+                                    'label_attr':{'class':'font-sans text-slate-100'},
+                                    'row_attr':{'class' : 'w-full grid justify-items-center  px-3 pt-5'},
+                                    'label':'Plantilla de una nueva template:'
+                                })
+                            }}
+                        </li>
+                    {% endfor %}
 
                     </ul>
 

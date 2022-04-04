@@ -91,6 +91,8 @@ class ProjectsController extends AbstractController
     public function generateQuery(Request $request, $id): Response
     {
         $query = new Project();
+
+        $query->setTemplateQuestions(new ArrayCollection([""]));
         //Generem el formulari
         $form = $this->createForm(QuestionFormType::class, $query);
 
