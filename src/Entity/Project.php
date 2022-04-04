@@ -24,7 +24,7 @@ class Project
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Question::class)]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Question::class, cascade: ['persist'])]
     private $templateQuestions;
 
     public function __construct()
@@ -79,6 +79,13 @@ class Project
     public function getTemplateQuestions(): Collection
     {
         return $this->templateQuestions;
+    }
+
+    public function setTemplateQuestions(Collection $collection): self
+    {
+        $this->templateQuestions = $collection;
+
+        return $this;
     }
 
     public function addTemplateQuestion(Question $templateQuestion): self

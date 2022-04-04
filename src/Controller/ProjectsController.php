@@ -14,6 +14,7 @@ use App\Form\QuestionFormType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Logic\UtilsFunctions;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ProjectsController extends AbstractController
 {
@@ -103,23 +104,24 @@ class ProjectsController extends AbstractController
             $newQuestions = $form->getData();
             $projectManager = $this->entmanager->getRepository(Project::class);
             $project = $projectManager->findOneBy(['id' => $id], []);
-
+            //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+            $projectAux = clone $project;
+            $projectAux->setTemplateQuestions(new ArrayCollection());
             foreach ($newQuestions->getTemplateQuestions() as $newQuestionString) {
                 $question = new Question();
-
                 $userManager = $this->entmanager->getRepository(User::class);
                 $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
                 $question->setCreator($user);
                 $question->setProject($project);
                 $question->setTemplateQuestion($newQuestionString);
 
-
+                $projectAux->addTemplateQuestion($question);
                 $project->addTemplateQuestion($question);
             }
 
             $restAPIController = new RestAPIController();
 
-            $responseToPetition = $restAPIController->getPossibilities($project);
+            $responseToPetition = $restAPIController->getPossibilities($projectAux);
 
             if ($responseToPetition->getStatusCode() == 200) {
                 $this->entmanager->persist($project);

@@ -29,10 +29,13 @@ class RestAPIController
     public function getPossibilities(Project $project): ResponseOfAPI
     {
         $filterParamsRestApi = new FilterParamsRestAPI();
+
+
         foreach ($project->getTemplateQuestions() as $questionTemplate) {
             $templateQuestion = new TemplateQuestion($questionTemplate->getTemplateQuestion());
             $filterParamsRestApi->addQuestion($templateQuestion);
         }
+
         $questionToSendToRestAPI = new QuestionToSendToRestAPI($filterParamsRestApi);
 
         $encoders = [new JsonEncoder()];
@@ -40,7 +43,7 @@ class RestAPIController
         $serializer = new Serializer($normalizers, $encoders);
 
         $data = [
-            //'file' => DataPart::fromPath($question->getPathToDbFile()),
+            'file' => DataPart::fromPath($project->getPathToDbFile()),
             'config' =>  $serializer->serialize($questionToSendToRestAPI, 'json'),
         ];
         $formData = new FormDataPart($data);
