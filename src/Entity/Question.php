@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\QuestionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
@@ -23,6 +25,14 @@ class Question
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]
     private $creator;
+
+    #[ORM\OneToMany(mappedBy: 'templateQuestion', targetEntity: Answer::class)]
+    private $answers;
+
+    public function __construct()
+    {
+        $this->answers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,6 +71,36 @@ class Question
     public function setCreator(?User $creator): self
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Answer>
+     */
+    public function getAnswers(): Collection
+    {
+        return $this->answers;
+    }
+
+    public function addAnswer(Answer $answer): self
+    {
+        if (!$this->answers->contains($answer)) {
+            $this->answers[] = $answer;
+            $answer->setTemplateQuestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAnswer(Answer $answer): self
+    {
+        if ($this->answers->removeElement($answer)) {
+            // set the owning side to null (unless already changed)
+            if ($answer->getTemplateQuestion() === $this) {
+                $answer->setTemplateQuestion(null);
+            }
+        }
 
         return $this;
     }
