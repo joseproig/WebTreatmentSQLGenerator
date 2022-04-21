@@ -90,11 +90,11 @@ class ProjectsController extends AbstractController
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
     public function generateQuery(Request $request, $id): Response
     {
-        $query = new Project();
+        $quest = new Question();
 
-        $query->setTemplateQuestions(new ArrayCollection([""]));
+        //$query->setTemplateQuestions(new ArrayCollection([""]));
         //Generem el formulari
-        $form = $this->createForm(QuestionFormType::class, $query);
+        $form = $this->createForm(QuestionFormType::class, $quest);
 
         $errorInFile = false;
 
@@ -103,23 +103,23 @@ class ProjectsController extends AbstractController
 
         //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
         if ($form->isSubmitted() && $form->isValid()) {
-            $newQuestions = $form->getData();
+            $newQuestion = $form->getData()->getTemplateQuestion();
             $projectManager = $this->entmanager->getRepository(Project::class);
             $project = $projectManager->findOneBy(['id' => $id], []);
             //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
             $projectAux = clone $project;
             $projectAux->setTemplateQuestions(new ArrayCollection());
-            foreach ($newQuestions->getTemplateQuestions() as $newQuestionString) {
-                $question = new Question();
-                $userManager = $this->entmanager->getRepository(User::class);
-                $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
-                $question->setCreator($user);
-                $question->setProject($project);
-                $question->setTemplateQuestion($newQuestionString);
 
-                $projectAux->addTemplateQuestion($question);
-                $project->addTemplateQuestion($question);
-            }
+            $question = new Question();
+            $userManager = $this->entmanager->getRepository(User::class);
+            $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
+            $question->setCreator($user);
+            $question->setProject($project);
+            $question->setTemplateQuestion($newQuestion);
+
+            $projectAux->addTemplateQuestion($question);
+            $project->addTemplateQuestion($question);
+
 
             $restAPIController = new RestAPIController();
 
@@ -152,6 +152,51 @@ class ProjectsController extends AbstractController
         $this->entmanager->flush();
 
         return $this->redirectToRoute('app_project_info', ['id' => $id]);
+    }
+
+    #[Route('/projects/{id}/templates/{id_template}/edit', name: 'app_edit_template')]
+    public function editTemplate(Request $request, $id, $id_template): Response
+    {
+
+        $questionManager = $this->entmanager->getRepository(Question::class);
+        $question = $questionManager->findOneBy(['id' => $id_template], []);
+
+        $form = $this->createForm(QuestionFormType::class, $question);
+
+        //Obtenim la petició
+        $form->handleRequest($request);
+
+        //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+        if ($form->isSubmitted() && $form->isValid()) {
+            $question->setTemplateQuestion($form->getData()->getTemplateQuestion());
+            $this->entmanager->flush();
+            //return $this->redirectToRoute('app_project_info', ['id' => $id]);
+
+
+            $restAPIController = new RestAPIController();
+
+            $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
+            $project->addTemplateQuestion($question);
+            $this->entmanager->flush();
+            //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+            $projectAux = clone $project;
+            $projectAux->setTemplateQuestions(new ArrayCollection());
+            $projectAux->addTemplateQuestion($question);
+
+            $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+            if ($responseToPetition->getStatusCode() == 200) {
+
+
+                return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+                    'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
+                ]);
+            }
+        }
+
+        return $this->renderForm("projects/templates/edittemplates.html.twig", [
+            'form' => $form
+        ]);
     }
 
     #[Route('/projects/{id}/delete', name: 'app_delete_project')]
