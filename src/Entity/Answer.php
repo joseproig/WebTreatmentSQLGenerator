@@ -26,6 +26,9 @@ class Answer
     #[ORM\JoinColumn(nullable: false)]
     private $templateQuestion;
 
+    #[ORM\Column(type: 'boolean')]
+    private $selected;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Answer
     public function setTemplateQuestion(?Question $templateQuestion): self
     {
         $this->templateQuestion = $templateQuestion;
+
+        return $this;
+    }
+
+    public function getSelected(): ?bool
+    {
+        return $this->selected;
+    }
+
+    public function setSelected(bool $selected): self
+    {
+        $this->selected = $selected;
 
         return $this;
     }

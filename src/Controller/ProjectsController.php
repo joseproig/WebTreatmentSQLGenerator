@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Project;
 use App\Entity\Question;
+use App\Entity\Answer;
 use App\Entity\User;
+use App\Form\AnswersFormType;
 use App\Logic\RestAPIController;
 use App\Form\ProjectFormType;
 use App\Form\QuestionFormType;
@@ -129,8 +131,27 @@ class ProjectsController extends AbstractController
                 $this->entmanager->persist($project);
                 $this->entmanager->flush();
 
+                //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
+                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                $answers = [];
+                foreach ($possibleQueries as $possibleQuery) {
+                    $newAnswer = new Answer();
+                    //dd($possibleQuery);
+                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                    $newAnswer->setAnswer($possibleQuery["answer"]);
+                    $newAnswer->setSelected(false);
+
+                    array_push($answers, $newAnswer);
+                }
+
+                $formAnswer = $this->createForm(AnswersFormType::class, $answers);
+
+
                 return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-                    'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
+                    'form' => $formAnswer
                 ]);
             }
         }
@@ -186,7 +207,6 @@ class ProjectsController extends AbstractController
             $responseToPetition = $restAPIController->getPossibilities($projectAux);
 
             if ($responseToPetition->getStatusCode() == 200) {
-
 
                 return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
                     'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
