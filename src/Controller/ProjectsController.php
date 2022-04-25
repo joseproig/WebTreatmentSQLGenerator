@@ -135,7 +135,7 @@ class ProjectsController extends AbstractController
                 $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
                 $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
 
-                $answers = [];
+                //$answers = [];
                 foreach ($possibleQueries as $possibleQuery) {
                     $newAnswer = new Answer();
                     //dd($possibleQuery);
@@ -143,11 +143,11 @@ class ProjectsController extends AbstractController
                     $newAnswer->setQuery($possibleQuery["textOfQuery"]);
                     $newAnswer->setAnswer($possibleQuery["answer"]);
                     $newAnswer->setSelected(false);
-
-                    array_push($answers, $newAnswer);
+                    $question->addAnswer($newAnswer);
+                    //array_push($answers, $newAnswer);
                 }
 
-                $formAnswer = $this->createForm(AnswersFormType::class, $answers);
+                $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
 
                 return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
