@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Logic\UtilsFunctions;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 class ProjectsController extends AbstractController
 {
@@ -89,8 +91,50 @@ class ProjectsController extends AbstractController
         ]);
     }
 
+    #[Route('/projects/{id}/templates/create/answers', name: 'app_generate_query_answers')]
+    public function newTemplateAnswers($id, SessionInterface $session): Response
+    {
+
+        $projectAux = $session->get('projectAux');
+        $question = $session->get('question');
+        $session->remove('projectAux');
+        $session->remove('question');
+
+
+        $restAPIController = new RestAPIController();
+
+        $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+        if ($responseToPetition->getStatusCode() == 200) {
+            //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
+            $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+            $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+            //$answers = [];
+            foreach ($possibleQueries as $possibleQuery) {
+                $newAnswer = new Answer();
+                //dd($possibleQuery);
+                $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                $newAnswer->setAnswer($possibleQuery["answer"]);
+                $newAnswer->setSelected(false);
+                $question->addAnswer($newAnswer);
+                //array_push($answers, $newAnswer);
+            }
+
+
+
+            $formAnswer = $this->createForm(AnswersFormType::class, $question);
+
+            return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+                'form' => $formAnswer
+            ]);
+        }
+    }
+
+
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
-    public function generateQuery(Request $request, $id): Response
+    public function generateQuery(Request $request, $id, SessionInterface $session): Response
     {
         $quest = new Question();
 
@@ -122,38 +166,14 @@ class ProjectsController extends AbstractController
             $projectAux->addTemplateQuestion($question);
             $project->addTemplateQuestion($question);
 
+            $this->entmanager->persist($project);
+            $this->entmanager->flush();
 
-            $restAPIController = new RestAPIController();
-
-            $responseToPetition = $restAPIController->getPossibilities($projectAux);
-
-            if ($responseToPetition->getStatusCode() == 200) {
-                $this->entmanager->persist($project);
-                $this->entmanager->flush();
-
-                //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
-                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
-                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
-
-                //$answers = [];
-                foreach ($possibleQueries as $possibleQuery) {
-                    $newAnswer = new Answer();
-                    //dd($possibleQuery);
-                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
-                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
-                    $newAnswer->setAnswer($possibleQuery["answer"]);
-                    $newAnswer->setSelected(false);
-                    $question->addAnswer($newAnswer);
-                    //array_push($answers, $newAnswer);
-                }
-
-                $formAnswer = $this->createForm(AnswersFormType::class, $question);
+            $session->set('projectAux', $projectAux);
+            $session->set('question', $question);
 
 
-                return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-                    'form' => $formAnswer
-                ]);
-            }
+            return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
         }
 
         return $this->renderForm("projects/templates/createnewtemplates.html.twig", [
