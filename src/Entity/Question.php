@@ -26,7 +26,7 @@ class Question
     #[ORM\JoinColumn(nullable: false)]
     private $creator;
 
-    #[ORM\OneToMany(mappedBy: 'templateQuestion', targetEntity: Answer::class)]
+    #[ORM\OneToMany(mappedBy: 'templateQuestion', targetEntity: Answer::class, cascade: ["persist", "remove"])]
     private $answers;
 
     public function __construct()
@@ -81,6 +81,14 @@ class Question
     public function getAnswers(): Collection
     {
         return $this->answers;
+    }
+
+
+    public function setAnswers($answers): self
+    {
+        $this->answers = $answers;
+
+        return $this;
     }
 
     public function addAnswer(Answer $answer): self

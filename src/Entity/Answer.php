@@ -22,7 +22,7 @@ class Answer
     #[ORM\Column(type: 'text')]
     private $answer;
 
-    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'answers')]
+    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'answers', cascade: ["persist", "remove"])]
     #[ORM\JoinColumn(nullable: false)]
     private $templateQuestion;
 

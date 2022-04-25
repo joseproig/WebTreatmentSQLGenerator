@@ -14,7 +14,8 @@ class AnswersFormType extends AbstractType
     {
         $builder
             ->add('answers', CollectionType::class, [
-                'entry_type' => AnswerFormType::class
+                'entry_type' => AnswerFormType::class,
+                'allow_extra_fields' => true
             ]);
     }
 

@@ -38,10 +38,17 @@
                         <!-- Description -->
                         <p class="text-sm text-gray-700 font-light mt-5 mb-5 leading-7"> {{question.templateQuestion}} </p>
                         
-                        <!-- Button -->
-                        <a href="{{project.id}}/templates/{{question.id}}/edit" class="bg-transparent mt-10 w-full py-3 px-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
-                            Editar Template
-                        </a>
+                        <div class="flex flex-col justify-center w-auto mt-10 text-center">
+                            <!-- Button -->
+                            <a href="{{project.id}}/templates/{{question.id}}/edit" class="my-3 w-auto bg-transparent w-full py-3 px-3 rounded-xl border border-red-600 text-red-600 hover:bg-red-600 hover:text-gray-50">
+                                Editar Template
+                            </a>
+
+                            <!-- Button 2 -->
+                            <a href="{{project.id}}/templates/{{question.id}}/edit/answers" class="bg-transparent w-full py-3 px-3 rounded-xl border border-green-600 text-green-600 hover:bg-green-600 hover:text-gray-50">
+                                Editar XML
+                            </a>
+                        </div>
                         
                     </card>
                 {% endfor %}

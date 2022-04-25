@@ -92,45 +92,31 @@ class ProjectsController extends AbstractController
     }
 
     #[Route('/projects/{id}/templates/create/answers', name: 'app_generate_query_answers')]
-    public function newTemplateAnswers($id, SessionInterface $session): Response
+    public function newTemplateAnswers(Request $request, $id, SessionInterface $session): Response
     {
-
-        $projectAux = $session->get('projectAux');
         $question = $session->get('question');
-        $session->remove('projectAux');
-        $session->remove('question');
+
+        $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
 
-        $restAPIController = new RestAPIController();
+        $formAnswer->handleRequest($request);
 
-        $responseToPetition = $restAPIController->getPossibilities($projectAux);
-
-        if ($responseToPetition->getStatusCode() == 200) {
-            //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
-            $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
-            $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
-
-            //$answers = [];
-            foreach ($possibleQueries as $possibleQuery) {
-                $newAnswer = new Answer();
-                //dd($possibleQuery);
-                $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
-                $newAnswer->setQuery($possibleQuery["textOfQuery"]);
-                $newAnswer->setAnswer($possibleQuery["answer"]);
-                $newAnswer->setSelected(false);
-                $question->addAnswer($newAnswer);
-                //array_push($answers, $newAnswer);
+        if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
+            $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
+            foreach ($question->getAnswers() as $ans) {
+                $questToUpdate->addAnswer($ans);
             }
-
-
-
-            $formAnswer = $this->createForm(AnswersFormType::class, $question);
-
-            return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-                'form' => $formAnswer
-            ]);
+            $this->entmanager->flush();
+            $session->remove('question');
+            return $this->redirectToRoute('app_projects');
         }
+
+        return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+            'form' => $formAnswer
+        ]);
     }
+
+
 
 
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
@@ -169,11 +155,38 @@ class ProjectsController extends AbstractController
             $this->entmanager->persist($project);
             $this->entmanager->flush();
 
-            $session->set('projectAux', $projectAux);
-            $session->set('question', $question);
+
+            //$projectAux = $session->get('projectAux');
+            //$question = $session->get('question');
+            //$session->remove('projectAux');
+            //$session->remove('question');
 
 
-            return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
+            $restAPIController = new RestAPIController();
+
+            $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+            if ($responseToPetition->getStatusCode() == 200) {
+                //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
+                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                //$answers = [];
+                foreach ($possibleQueries as $possibleQuery) {
+                    $newAnswer = new Answer();
+                    //dd($possibleQuery);
+                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                    $newAnswer->setAnswer($possibleQuery["answer"]);
+                    $newAnswer->setSelected(false);
+                    $question->addAnswer($newAnswer);
+                    //array_push($answers, $newAnswer);
+                }
+
+                $session->set('question', $question);
+
+                return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
+            }
         }
 
         return $this->renderForm("projects/templates/createnewtemplates.html.twig", [
@@ -194,6 +207,27 @@ class ProjectsController extends AbstractController
 
         return $this->redirectToRoute('app_project_info', ['id' => $id]);
     }
+
+
+    #[Route('/projects/{id}/templates/{id_template}/edit/answers', name: 'app_edit_query_answers')]
+    public function editTemplateAnswers(Request $request, $id, $id_template): Response
+    {
+        $question = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $id_template], []);
+
+        $formAnswer = $this->createForm(AnswersFormType::class, $question);
+
+        $formAnswer->handleRequest($request);
+
+        if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
+            $this->entmanager->flush();
+            return $this->redirectToRoute('app_projects');
+        }
+
+        return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+            'form' => $formAnswer
+        ]);
+    }
+
 
     #[Route('/projects/{id}/templates/{id_template}/edit', name: 'app_edit_template')]
     public function editTemplate(Request $request, $id, $id_template): Response
