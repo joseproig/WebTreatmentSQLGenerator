@@ -48,7 +48,7 @@ class RestAPIController
         ];
         $formData = new FormDataPart($data);
 
-        $response = $this->client->request('POST', 'http://localhost:8086/getPossibilities', [
+        $response = $this->client->request('POST', 'http://localhost:8086/answers', [
             'headers' => $formData->getPreparedHeaders()->toArray(),
             'body' => $formData->bodyToIterable(),
         ]);
@@ -61,5 +61,38 @@ class RestAPIController
         }
 
         return $responseOfAPI;
+    }
+
+
+    public function downloadXML(Question $questionXML): void
+    {
+        $opts = array(
+            'http' =>
+            array(
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/json\r\n",
+                'content' => json_encode($questionXML)
+            )
+        );
+
+        //dd("question: " . json_encode($questToXML));
+
+        $context  = stream_context_create($opts);
+        $result = file_get_contents('http://localhost:8086/answers/download', false, $context);
+
+
+        $file_name = 'estudy.xml';
+
+        $handle = fopen($file_name, 'w');
+        fclose($handle);
+
+
+        file_put_contents($file_name, $result);
+
+        header('Content-Type: application/octet-stream');
+        header("Content-Transfer-Encoding: Binary");
+        header('Content-Length: ' . filesize($file_name));
+        header("Content-disposition: attachment; filename=\"" . basename($file_name) . "\"");
+        readfile($file_name);
     }
 }

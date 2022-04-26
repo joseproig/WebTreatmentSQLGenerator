@@ -6,9 +6,10 @@ use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
-class Question
+class Question implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -111,5 +112,15 @@ class Question
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'templateQuestion' => $this->templateQuestion,
+            'answers' => array_values($this->answers->toArray()),
+            'project' => $this->project
+        ];
     }
 }

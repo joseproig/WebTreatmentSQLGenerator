@@ -103,11 +103,20 @@ class ProjectsController extends AbstractController
 
         if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
             $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
+
             foreach ($question->getAnswers() as $ans) {
                 $questToUpdate->addAnswer($ans);
             }
+
             $this->entmanager->flush();
+
             $session->remove('question');
+
+            $restAPIController = new RestAPIController();
+
+            $restAPIController->downloadXML($questToUpdate);
+
+
             return $this->redirectToRoute('app_projects');
         }
 
@@ -220,6 +229,18 @@ class ProjectsController extends AbstractController
 
         if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
             $this->entmanager->flush();
+
+            $questToXML = clone $question;
+
+
+
+            //dd(array_values($questToXML->getAnswers()->toArray()));
+
+            $restAPIController = new RestAPIController();
+
+            $restAPIController->downloadXML($questToXML);
+
+
             return $this->redirectToRoute('app_projects');
         }
 

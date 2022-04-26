@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: AnswerRepository::class)]
-class Answer
+class Answer implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -92,5 +93,16 @@ class Answer
         $this->selected = $selected;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'statement' => $this->statement,
+            'query' => $this->query,
+            'answer' => $this->answer,
+            'selected' => $this->selected
+        ];
     }
 }

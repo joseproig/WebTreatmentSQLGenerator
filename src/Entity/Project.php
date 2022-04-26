@@ -6,9 +6,10 @@ use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-class Project
+class Project implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -108,5 +109,15 @@ class Project
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'pathToDbFile' => $this->pathToDbFile,
+            'name' => $this->name,
+            'description' => $this->description
+        ];
     }
 }
