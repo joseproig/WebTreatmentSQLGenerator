@@ -114,10 +114,24 @@ class ProjectsController extends AbstractController
 
             $restAPIController = new RestAPIController();
 
-            $restAPIController->downloadXML($questToUpdate);
+            $result = $restAPIController->downloadXML($questToUpdate);
 
 
-            return $this->redirectToRoute('app_projects');
+
+            $response = new Response();
+            $file_name = 'estudy.xml';
+
+            // Set headers
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
+            $response->headers->set('Content-Type', 'application/x-download');
+            $response->headers->set('Content-Transfer-Encoding', 'binary');
+            // Send headers before outputting anything
+            $response->sendHeaders();
+
+            $response->setContent($result);
+
+
+            return $response;
         }
 
         return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
@@ -238,10 +252,23 @@ class ProjectsController extends AbstractController
 
             $restAPIController = new RestAPIController();
 
-            $restAPIController->downloadXML($questToXML);
+            $result = $restAPIController->downloadXML($questToXML);
 
 
-            return $this->redirectToRoute('app_projects');
+            $response = new Response();
+            $file_name = 'estudy.xml';
+
+            // Set headers
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
+            $response->headers->set('Content-Type', 'application/x-download');
+            $response->headers->set('Content-Transfer-Encoding', 'binary');
+            // Send headers before outputting anything
+            $response->sendHeaders();
+
+            $response->setContent($result);
+
+
+            return $response;
         }
 
         return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
@@ -251,7 +278,7 @@ class ProjectsController extends AbstractController
 
 
     #[Route('/projects/{id}/templates/{id_template}/edit', name: 'app_edit_template')]
-    public function editTemplate(Request $request, $id, $id_template): Response
+    public function editTemplate(Request $request, $id, $id_template, SessionInterface $session): Response
     {
 
         $questionManager = $this->entmanager->getRepository(Question::class);
@@ -281,11 +308,26 @@ class ProjectsController extends AbstractController
 
             $responseToPetition = $restAPIController->getPossibilities($projectAux);
 
-            if ($responseToPetition->getStatusCode() == 200) {
 
-                return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-                    'possibleQueries' => $responseToPetition->getResponse()->getPossibleQueries(),
-                ]);
+            if ($responseToPetition->getStatusCode() == 200) {
+                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                //$answers = [];
+                foreach ($possibleQueries as $possibleQuery) {
+                    $newAnswer = new Answer();
+                    //dd($possibleQuery);
+                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                    $newAnswer->setAnswer($possibleQuery["answer"]);
+                    $newAnswer->setSelected(false);
+                    $question->addAnswer($newAnswer);
+                    //array_push($answers, $newAnswer);
+                }
+
+                $session->set('question', $question);
+
+                return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
             }
         }
 

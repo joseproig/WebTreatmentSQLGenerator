@@ -64,7 +64,7 @@ class RestAPIController
     }
 
 
-    public function downloadXML(Question $questionXML): void
+    public function downloadXML(Question $questionXML): String
     {
         $opts = array(
             'http' =>
@@ -80,19 +80,6 @@ class RestAPIController
         $context  = stream_context_create($opts);
         $result = file_get_contents('http://localhost:8086/answers/download', false, $context);
 
-
-        $file_name = 'estudy.xml';
-
-        $handle = fopen($file_name, 'w');
-        fclose($handle);
-
-
-        file_put_contents($file_name, $result);
-
-        header('Content-Type: application/octet-stream');
-        header("Content-Transfer-Encoding: Binary");
-        header('Content-Length: ' . filesize($file_name));
-        header("Content-disposition: attachment; filename=\"" . basename($file_name) . "\"");
-        readfile($file_name);
+        return $result;
     }
 }
