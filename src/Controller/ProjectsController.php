@@ -283,7 +283,7 @@ class ProjectsController extends AbstractController
 
         $questionManager = $this->entmanager->getRepository(Question::class);
         $question = $questionManager->findOneBy(['id' => $id_template], []);
-
+        $question->setAnswers(new ArrayCollection());
         $form = $this->createForm(QuestionFormType::class, $question);
 
         //Obtenim la petició
