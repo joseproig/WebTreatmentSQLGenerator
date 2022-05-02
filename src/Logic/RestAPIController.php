@@ -7,6 +7,7 @@ use App\Entity\Question;
 use App\Entity\Project;
 use App\Entity\RestAPIEntities\ResponseEntities\PossibleQueries;
 use App\Entity\RestAPIEntities\ResponseEntities\ResponseOfAPI;
+use App\Entity\RestAPIEntities\ResponseEntities\Schema;
 use App\Entity\RestAPIEntities\SendEntities\FilterParamsRestAPI;
 use App\Entity\RestAPIEntities\SendEntities\QuestionToSendToRestAPI;
 use App\Entity\RestAPIEntities\SendEntities\TemplateQuestion;
@@ -55,6 +56,43 @@ class RestAPIController
 
         if ($response->getStatusCode() == 200) {
             $responseAdaptedObject = $serializer->deserialize($response->getContent(), PossibleQueries::class, 'json');
+            $responseOfAPI = new ResponseOfAPI($responseAdaptedObject, $response->getStatusCode());
+        } else {
+            $responseOfAPI = new ResponseOfAPI(null, $response->getStatusCode());
+        }
+
+        return $responseOfAPI;
+    }
+
+    public function getSchemaOfProject(Project $project): ResponseOfAPI
+    {
+        $filterParamsRestApi = new FilterParamsRestAPI();
+
+
+        foreach ($project->getTemplateQuestions() as $questionTemplate) {
+            $templateQuestion = new TemplateQuestion($questionTemplate->getTemplateQuestion());
+            $filterParamsRestApi->addQuestion($templateQuestion);
+        }
+
+        $questionToSendToRestAPI = new QuestionToSendToRestAPI($filterParamsRestApi);
+
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $data = [
+            'file' => DataPart::fromPath($project->getPathToDbFile()),
+            'config' =>  $serializer->serialize($questionToSendToRestAPI, 'json'),
+        ];
+        $formData = new FormDataPart($data);
+
+        $response = $this->client->request('GET', 'http://localhost:8086/schema', [
+            'headers' => $formData->getPreparedHeaders()->toArray(),
+            'body' => $formData->bodyToIterable(),
+        ]);
+
+        if ($response->getStatusCode() == 200) {
+            $responseAdaptedObject = $serializer->deserialize($response->getContent(), Schema::class, 'json');
             $responseOfAPI = new ResponseOfAPI($responseAdaptedObject, $response->getStatusCode());
         } else {
             $responseOfAPI = new ResponseOfAPI(null, $response->getStatusCode());

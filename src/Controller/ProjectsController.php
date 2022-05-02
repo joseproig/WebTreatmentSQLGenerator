@@ -91,6 +91,15 @@ class ProjectsController extends AbstractController
         ]);
     }
 
+
+    #[Route('/password', name: 'app_password_protection')]
+    public function password(): Response
+    {
+
+
+        return $this->render('projects/projectDetails.html.twig');
+    }
+
     #[Route('/projects/{id}/templates/create/answers', name: 'app_generate_query_answers')]
     public function newTemplateAnswers(Request $request, $id, SessionInterface $session): Response
     {
@@ -134,8 +143,20 @@ class ProjectsController extends AbstractController
             return $response;
         }
 
+        $restAPIController = new RestAPIController();
+
+        $project = $question->getProject();
+
+        $responseToPetition = $restAPIController->getSchemaOfProject($project);
+
+        $schema = "";
+        if ($responseToPetition->getStatusCode() == 200) {
+            $schema = $responseToPetition->getResponse()->getSchemaString();
+        }
+
         return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-            'form' => $formAnswer
+            'form' => $formAnswer,
+            'schema' => $schema
         ]);
     }
 
@@ -271,8 +292,24 @@ class ProjectsController extends AbstractController
             return $response;
         }
 
+        $restAPIController = new RestAPIController();
+
+        $project = $question->getProject();
+
+        $responseToPetition = $restAPIController->getSchemaOfProject($project);
+
+        $schema = "";
+        if ($responseToPetition->getStatusCode() == 200) {
+            $schema = $responseToPetition->getResponse()->getSchemaString();
+        }
+        $schema = "";
+        if ($responseToPetition->getStatusCode() == 200) {
+            $schema = $responseToPetition->getResponse()->getSchemaString();
+        }
+
         return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-            'form' => $formAnswer
+            'form' => $formAnswer,
+            'schema' => $schema
         ]);
     }
 
