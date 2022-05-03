@@ -9,7 +9,9 @@ use App\Entity\Project;
 use App\Entity\Question;
 use App\Entity\Answer;
 use App\Entity\User;
+use App\Entity\Password;
 use App\Form\AnswersFormType;
+use App\Form\PasswordFormType;
 use App\Logic\RestAPIController;
 use App\Form\ProjectFormType;
 use App\Form\QuestionFormType;
@@ -24,6 +26,7 @@ class ProjectsController extends AbstractController
 {
 
     private $entmanager;
+    private $DEFAULT_PASSWORD = "elCarbassotFaElQuePot*2021/2022";
 
     public function __construct(EntityManagerInterface $entmanager)
     {
@@ -93,11 +96,26 @@ class ProjectsController extends AbstractController
 
 
     #[Route('/password', name: 'app_password_protection')]
-    public function password(): Response
+    public function password(Request $request): Response
     {
 
+        $password = new Password();
+        //Generem el formulari
+        $form = $this->createForm(PasswordFormType::class, $password);
 
-        return $this->render('projects/projectDetails.html.twig');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $password = $form->getData()->getPassword();
+
+            if (strcmp($password, $this->DEFAULT_PASSWORD) == 0) {
+                return $this->redirectToRoute('app_projects');
+            }
+        }
+
+        return $this->renderForm('security/password.html.twig', [
+            'form' => $form
+        ]);
     }
 
     #[Route('/projects/{id}/templates/create/answers', name: 'app_generate_query_answers')]
