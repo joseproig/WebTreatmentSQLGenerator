@@ -26,7 +26,7 @@ class ProjectsController extends AbstractController
 {
 
     private $entmanager;
-    private $DEFAULT_PASSWORD = "elCarbassotFaElQuePot*2021/2022";
+    #private $DEFAULT_PASSWORD = "elCarbassotFaElQuePot*2021/2022";
 
     public function __construct(EntityManagerInterface $entmanager)
     {
@@ -34,13 +34,19 @@ class ProjectsController extends AbstractController
     }
 
     #[Route('/projects', name: 'app_projects')]
-    public function index(): Response
+    public function index(SessionInterface $session): Response
     {
-        $projectManager = $this->entmanager->getRepository(Project::class);
-        $projects = $projectManager->findAll();
-        return $this->render('projects/index.html.twig', [
-            'projects' => $projects,
-        ]);
+        $pass = $session->get('password');
+
+        if ($pass == true) {
+            $projectManager = $this->entmanager->getRepository(Project::class);
+            $projects = $projectManager->findAll();
+            return $this->render('projects/index.html.twig', [
+                'projects' => $projects,
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
     const EXTENSION_OF_PNG = 'png';
@@ -50,53 +56,65 @@ class ProjectsController extends AbstractController
 
 
     #[Route('/projects/create', name: 'app_newproject')]
-    public function createProject(Request $request): Response
+    public function createProject(Request $request, SessionInterface $session): Response
     {
-        $project = new Project();
-        //Generem el formulari
-        $form = $this->createForm(ProjectFormType::class, $project);
+        $pass = $session->get('password');
 
-        $errorInFile = false;
+        if ($pass == true) {
+            $project = new Project();
+            //Generem el formulari
+            $form = $this->createForm(ProjectFormType::class, $project);
 
-        //Obtenim la petició
-        $form->handleRequest($request);
+            $errorInFile = false;
+
+            //Obtenim la petició
+            $form->handleRequest($request);
 
 
-        //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
-        if ($form->isSubmitted() && $form->isValid()) {
-            $project = $form->getData();
-            $fileDB = $form->get('pathToDbFile')->getData();
-            $extension = $fileDB->getClientOriginalExtension();
-            if (strcmp($extension, self::EXTENSION_OF_DB) == 0) {
-                $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'), $fileDB, $extension, 'dbs'));
-                $this->entmanager->persist($project);
-                $this->entmanager->flush();
-                return $this->redirectToRoute("app_projects");
-            } else {
-                $errorInFile = true;
+            //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+            if ($form->isSubmitted() && $form->isValid()) {
+                $project = $form->getData();
+                $fileDB = $form->get('pathToDbFile')->getData();
+                $extension = $fileDB->getClientOriginalExtension();
+                if (strcmp($extension, self::EXTENSION_OF_DB) == 0) {
+                    $project->setPathToDBFile(UtilsFunctions::getInstance()->moveFileFromTmpToPublic($this->getParameter('kernel.project_dir'), $fileDB, $extension, 'dbs'));
+                    $this->entmanager->persist($project);
+                    $this->entmanager->flush();
+                    return $this->redirectToRoute("app_projects");
+                } else {
+                    $errorInFile = true;
+                }
             }
-        }
 
-        return $this->renderForm("projects/newprojectform.html.twig", [
-            'form' => $form,
-            'errorInFile' => $errorInFile
-        ]);
+            return $this->renderForm("projects/newprojectform.html.twig", [
+                'form' => $form,
+                'errorInFile' => $errorInFile
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
     #[Route('/projects/{id}', name: 'app_project_info')]
-    public function projectInfo($id): Response
+    public function projectInfo($id, SessionInterface $session): Response
     {
-        $projectManager = $this->entmanager->getRepository(Project::class);
-        $project = $projectManager->findOneBy(['id' => $id], []);
+        $pass = $session->get('password');
 
-        return $this->render('projects/projectDetails.html.twig', [
-            'project' => $project
-        ]);
+        if ($pass == true) {
+            $projectManager = $this->entmanager->getRepository(Project::class);
+            $project = $projectManager->findOneBy(['id' => $id], []);
+
+            return $this->render('projects/projectDetails.html.twig', [
+                'project' => $project
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
 
     #[Route('/password', name: 'app_password_protection')]
-    public function password(Request $request): Response
+    public function password(Request $request, SessionInterface $session): Response
     {
 
         $password = new Password();
@@ -108,7 +126,9 @@ class ProjectsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $password = $form->getData()->getPassword();
 
-            if (strcmp($password, $this->DEFAULT_PASSWORD) == 0) {
+
+            if (strcmp($password, $this->getParameter('app.secretPass')) == 0) {
+                $session->set('password', true);
                 return $this->redirectToRoute('app_projects');
             }
         }
@@ -121,61 +141,68 @@ class ProjectsController extends AbstractController
     #[Route('/projects/{id}/templates/create/answers', name: 'app_generate_query_answers')]
     public function newTemplateAnswers(Request $request, $id, SessionInterface $session): Response
     {
-        $question = $session->get('question');
 
-        $formAnswer = $this->createForm(AnswersFormType::class, $question);
+        $pass = $session->get('password');
+
+        if ($pass == true) {
+            $question = $session->get('question');
+
+            $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
 
-        $formAnswer->handleRequest($request);
+            $formAnswer->handleRequest($request);
 
-        if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
-            $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
+            if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
+                $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
 
-            foreach ($question->getAnswers() as $ans) {
-                $questToUpdate->addAnswer($ans);
+                foreach ($question->getAnswers() as $ans) {
+                    $questToUpdate->addAnswer($ans);
+                }
+
+                $this->entmanager->flush();
+
+                $session->remove('question');
+
+                $restAPIController = new RestAPIController();
+
+                $result = $restAPIController->downloadXML($questToUpdate);
+
+
+
+                $response = new Response();
+                $file_name = 'estudy.xml';
+
+                // Set headers
+                $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
+                $response->headers->set('Content-Type', 'application/x-download');
+                $response->headers->set('Content-Transfer-Encoding', 'binary');
+                // Send headers before outputting anything
+                $response->sendHeaders();
+
+                $response->setContent($result);
+
+
+                return $response;
             }
-
-            $this->entmanager->flush();
-
-            $session->remove('question');
 
             $restAPIController = new RestAPIController();
 
-            $result = $restAPIController->downloadXML($questToUpdate);
+            $project = $question->getProject();
 
+            $responseToPetition = $restAPIController->getSchemaOfProject($project);
 
+            $schema = "";
+            if ($responseToPetition->getStatusCode() == 200) {
+                $schema = $responseToPetition->getResponse()->getSchemaString();
+            }
 
-            $response = new Response();
-            $file_name = 'estudy.xml';
-
-            // Set headers
-            $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
-            $response->headers->set('Content-Type', 'application/x-download');
-            $response->headers->set('Content-Transfer-Encoding', 'binary');
-            // Send headers before outputting anything
-            $response->sendHeaders();
-
-            $response->setContent($result);
-
-
-            return $response;
+            return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+                'form' => $formAnswer,
+                'schema' => $schema
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
         }
-
-        $restAPIController = new RestAPIController();
-
-        $project = $question->getProject();
-
-        $responseToPetition = $restAPIController->getSchemaOfProject($project);
-
-        $schema = "";
-        if ($responseToPetition->getStatusCode() == 200) {
-            $schema = $responseToPetition->getResponse()->getSchemaString();
-        }
-
-        return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-            'form' => $formAnswer,
-            'schema' => $schema
-        ]);
     }
 
 
@@ -184,151 +211,171 @@ class ProjectsController extends AbstractController
     #[Route('/projects/{id}/templates/create', name: 'app_generate_query')]
     public function generateQuery(Request $request, $id, SessionInterface $session): Response
     {
-        $quest = new Question();
 
-        //$query->setTemplateQuestions(new ArrayCollection([""]));
-        //Generem el formulari
-        $form = $this->createForm(QuestionFormType::class, $quest);
+        $pass = $session->get('password');
 
-        $errorInFile = false;
+        if ($pass == true) {
+            $quest = new Question();
 
-        //Obtenim la petició
-        $form->handleRequest($request);
+            //$query->setTemplateQuestions(new ArrayCollection([""]));
+            //Generem el formulari
+            $form = $this->createForm(QuestionFormType::class, $quest);
 
-        //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
-        if ($form->isSubmitted() && $form->isValid()) {
-            $newQuestion = $form->getData()->getTemplateQuestion();
-            $projectManager = $this->entmanager->getRepository(Project::class);
-            $project = $projectManager->findOneBy(['id' => $id], []);
-            //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
-            $projectAux = clone $project;
-            $projectAux->setTemplateQuestions(new ArrayCollection());
+            $errorInFile = false;
 
-            $question = new Question();
-            $userManager = $this->entmanager->getRepository(User::class);
-            $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
-            $question->setCreator($user);
-            $question->setProject($project);
-            $question->setTemplateQuestion($newQuestion);
+            //Obtenim la petició
+            $form->handleRequest($request);
 
-            $projectAux->addTemplateQuestion($question);
-            $project->addTemplateQuestion($question);
+            //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+            if ($form->isSubmitted() && $form->isValid()) {
+                $newQuestion = $form->getData()->getTemplateQuestion();
+                $projectManager = $this->entmanager->getRepository(Project::class);
+                $project = $projectManager->findOneBy(['id' => $id], []);
+                //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+                $projectAux = clone $project;
+                $projectAux->setTemplateQuestions(new ArrayCollection());
 
-            $this->entmanager->persist($project);
-            $this->entmanager->flush();
+                $question = new Question();
+                $userManager = $this->entmanager->getRepository(User::class);
+                $user = $userManager->findOneBy(['username' => 'josep.roig'], []);
+                $question->setCreator($user);
+                $question->setProject($project);
+                $question->setTemplateQuestion($newQuestion);
 
+                $projectAux->addTemplateQuestion($question);
+                $project->addTemplateQuestion($question);
 
-            //$projectAux = $session->get('projectAux');
-            //$question = $session->get('question');
-            //$session->remove('projectAux');
-            //$session->remove('question');
+                $this->entmanager->persist($project);
+                $this->entmanager->flush();
 
 
-            $restAPIController = new RestAPIController();
+                //$projectAux = $session->get('projectAux');
+                //$question = $session->get('question');
+                //$session->remove('projectAux');
+                //$session->remove('question');
 
-            $responseToPetition = $restAPIController->getPossibilities($projectAux);
 
-            if ($responseToPetition->getStatusCode() == 200) {
-                //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
-                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
-                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+                $restAPIController = new RestAPIController();
 
-                //$answers = [];
-                foreach ($possibleQueries as $possibleQuery) {
-                    $newAnswer = new Answer();
-                    //dd($possibleQuery);
-                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
-                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
-                    $newAnswer->setAnswer($possibleQuery["answer"]);
-                    $newAnswer->setSelected(false);
-                    $question->addAnswer($newAnswer);
-                    //array_push($answers, $newAnswer);
+                $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+                if ($responseToPetition->getStatusCode() == 200) {
+                    //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
+                    $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                    $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                    //$answers = [];
+                    foreach ($possibleQueries as $possibleQuery) {
+                        $newAnswer = new Answer();
+                        //dd($possibleQuery);
+                        $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                        $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                        $newAnswer->setAnswer($possibleQuery["answer"]);
+                        $newAnswer->setSelected(false);
+                        $question->addAnswer($newAnswer);
+                        //array_push($answers, $newAnswer);
+                    }
+
+                    $session->set('question', $question);
+
+                    return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
                 }
-
-                $session->set('question', $question);
-
-                return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
             }
-        }
 
-        return $this->renderForm("projects/templates/createnewtemplates.html.twig", [
-            'form' => $form,
-            'errorInFile' => $errorInFile
-        ]);
+            return $this->renderForm("projects/templates/createnewtemplates.html.twig", [
+                'form' => $form,
+                'errorInFile' => $errorInFile
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
     #[Route('/projects/{id}/templates/{id_template}/delete', name: 'app_delete_template')]
-    public function deleteTemplate($id, $id_template): Response
+    public function deleteTemplate($id, $id_template,  SessionInterface $session): Response
     {
 
-        $questionManager = $this->entmanager->getRepository(Question::class);
-        $question = $questionManager->findOneBy(['id' => $id_template], []);
+        $pass = $session->get('password');
 
-        $this->entmanager->remove($question);
-        $this->entmanager->flush();
+        if ($pass == true) {
+            $questionManager = $this->entmanager->getRepository(Question::class);
+            $question = $questionManager->findOneBy(['id' => $id_template], []);
 
-        return $this->redirectToRoute('app_project_info', ['id' => $id]);
+            $this->entmanager->remove($question);
+            $this->entmanager->flush();
+
+            return $this->redirectToRoute('app_project_info', ['id' => $id]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
 
     #[Route('/projects/{id}/templates/{id_template}/edit/answers', name: 'app_edit_query_answers')]
-    public function editTemplateAnswers(Request $request, $id, $id_template): Response
+    public function editTemplateAnswers(Request $request, $id, $id_template,  SessionInterface $session): Response
     {
-        $question = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $id_template], []);
 
-        $formAnswer = $this->createForm(AnswersFormType::class, $question);
+        $pass = $session->get('password');
 
-        $formAnswer->handleRequest($request);
+        if ($pass == true) {
+            $question = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $id_template], []);
 
-        if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
-            $this->entmanager->flush();
+            $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
-            $questToXML = clone $question;
+            $formAnswer->handleRequest($request);
+
+            if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
+                $this->entmanager->flush();
+
+                $questToXML = clone $question;
 
 
 
-            //dd(array_values($questToXML->getAnswers()->toArray()));
+                //dd(array_values($questToXML->getAnswers()->toArray()));
+
+                $restAPIController = new RestAPIController();
+
+                $result = $restAPIController->downloadXML($questToXML);
+
+
+                $response = new Response();
+                $file_name = 'estudy.xml';
+
+                // Set headers
+                $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
+                $response->headers->set('Content-Type', 'application/x-download');
+                $response->headers->set('Content-Transfer-Encoding', 'binary');
+                // Send headers before outputting anything
+                $response->sendHeaders();
+
+                $response->setContent($result);
+
+
+                return $response;
+            }
 
             $restAPIController = new RestAPIController();
 
-            $result = $restAPIController->downloadXML($questToXML);
+            $project = $question->getProject();
 
+            $responseToPetition = $restAPIController->getSchemaOfProject($project);
 
-            $response = new Response();
-            $file_name = 'estudy.xml';
+            $schema = "";
+            if ($responseToPetition->getStatusCode() == 200) {
+                $schema = $responseToPetition->getResponse()->getSchemaString();
+            }
+            $schema = "";
+            if ($responseToPetition->getStatusCode() == 200) {
+                $schema = $responseToPetition->getResponse()->getSchemaString();
+            }
 
-            // Set headers
-            $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '";');
-            $response->headers->set('Content-Type', 'application/x-download');
-            $response->headers->set('Content-Transfer-Encoding', 'binary');
-            // Send headers before outputting anything
-            $response->sendHeaders();
-
-            $response->setContent($result);
-
-
-            return $response;
+            return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
+                'form' => $formAnswer,
+                'schema' => $schema
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
         }
-
-        $restAPIController = new RestAPIController();
-
-        $project = $question->getProject();
-
-        $responseToPetition = $restAPIController->getSchemaOfProject($project);
-
-        $schema = "";
-        if ($responseToPetition->getStatusCode() == 200) {
-            $schema = $responseToPetition->getResponse()->getSchemaString();
-        }
-        $schema = "";
-        if ($responseToPetition->getStatusCode() == 200) {
-            $schema = $responseToPetition->getResponse()->getSchemaString();
-        }
-
-        return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
-            'form' => $formAnswer,
-            'schema' => $schema
-        ]);
     }
 
 
@@ -336,71 +383,84 @@ class ProjectsController extends AbstractController
     public function editTemplate(Request $request, $id, $id_template, SessionInterface $session): Response
     {
 
-        $questionManager = $this->entmanager->getRepository(Question::class);
-        $question = $questionManager->findOneBy(['id' => $id_template], []);
-        $question->setAnswers(new ArrayCollection());
-        $form = $this->createForm(QuestionFormType::class, $question);
+        $pass = $session->get('password');
 
-        //Obtenim la petició
-        $form->handleRequest($request);
+        if ($pass == true) {
 
-        //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
-        if ($form->isSubmitted() && $form->isValid()) {
-            $question->setTemplateQuestion($form->getData()->getTemplateQuestion());
-            $this->entmanager->flush();
-            //return $this->redirectToRoute('app_project_info', ['id' => $id]);
+            $questionManager = $this->entmanager->getRepository(Question::class);
+            $question = $questionManager->findOneBy(['id' => $id_template], []);
+            $question->setAnswers(new ArrayCollection());
+            $form = $this->createForm(QuestionFormType::class, $question);
 
+            //Obtenim la petició
+            $form->handleRequest($request);
 
-            $restAPIController = new RestAPIController();
-
-            $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
-            $project->addTemplateQuestion($question);
-            $this->entmanager->flush();
-            //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
-            $projectAux = clone $project;
-            $projectAux->setTemplateQuestions(new ArrayCollection());
-            $projectAux->addTemplateQuestion($question);
-
-            $responseToPetition = $restAPIController->getPossibilities($projectAux);
+            //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+            if ($form->isSubmitted() && $form->isValid()) {
+                $question->setTemplateQuestion($form->getData()->getTemplateQuestion());
+                $this->entmanager->flush();
+                //return $this->redirectToRoute('app_project_info', ['id' => $id]);
 
 
-            if ($responseToPetition->getStatusCode() == 200) {
-                $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
-                $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+                $restAPIController = new RestAPIController();
 
-                //$answers = [];
-                foreach ($possibleQueries as $possibleQuery) {
-                    $newAnswer = new Answer();
-                    //dd($possibleQuery);
-                    $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
-                    $newAnswer->setQuery($possibleQuery["textOfQuery"]);
-                    $newAnswer->setAnswer($possibleQuery["answer"]);
-                    $newAnswer->setSelected(false);
-                    $question->addAnswer($newAnswer);
-                    //array_push($answers, $newAnswer);
+                $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
+                $project->addTemplateQuestion($question);
+                $this->entmanager->flush();
+                //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+                $projectAux = clone $project;
+                $projectAux->setTemplateQuestions(new ArrayCollection());
+                $projectAux->addTemplateQuestion($question);
+
+                $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+
+                if ($responseToPetition->getStatusCode() == 200) {
+                    $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                    $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                    //$answers = [];
+                    foreach ($possibleQueries as $possibleQuery) {
+                        $newAnswer = new Answer();
+                        //dd($possibleQuery);
+                        $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                        $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                        $newAnswer->setAnswer($possibleQuery["answer"]);
+                        $newAnswer->setSelected(false);
+                        $question->addAnswer($newAnswer);
+                        //array_push($answers, $newAnswer);
+                    }
+
+                    $session->set('question', $question);
+
+                    return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
                 }
-
-                $session->set('question', $question);
-
-                return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
             }
-        }
 
-        return $this->renderForm("projects/templates/edittemplates.html.twig", [
-            'form' => $form
-        ]);
+            return $this->renderForm("projects/templates/edittemplates.html.twig", [
+                'form' => $form
+            ]);
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 
     #[Route('/projects/{id}/delete', name: 'app_delete_project')]
-    public function deleteProject($id): Response
+    public function deleteProject($id, SessionInterface $session): Response
     {
 
-        $projectManager = $this->entmanager->getRepository(Project::class);
-        $project = $projectManager->find($id);
+        $pass = $session->get('password');
 
-        $this->entmanager->remove($project);
-        $this->entmanager->flush();
+        if ($pass == true) {
+            $projectManager = $this->entmanager->getRepository(Project::class);
+            $project = $projectManager->find($id);
 
-        return $this->redirectToRoute('app_projects');
+            $this->entmanager->remove($project);
+            $this->entmanager->flush();
+
+            return $this->redirectToRoute('app_projects');
+        } else {
+            return $this->redirectToRoute('app_password_protection');
+        }
     }
 }
