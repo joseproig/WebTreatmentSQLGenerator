@@ -147,6 +147,66 @@ class ProjectsController extends AbstractController
         if ($pass == true) {
             $question = $session->get('question');
 
+
+            $form2 = $this->createForm(QuestionFormType::class, $question);
+
+            //Obtenim la petició
+            $form2->handleRequest($request);
+
+            //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+            if ($form2->isSubmitted() && $form2->isValid()) {
+                $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
+
+                $questToUpdate->setTemplateQuestion($form2->getData()->getTemplateQuestion());
+
+                foreach ($question->getAnswers() as $answr) {
+                    //$question->removeAnswer($answr);
+                    $this->entmanager->remove($answr);
+                }
+
+                $this->entmanager->flush();
+                //return $this->redirectToRoute('app_project_info', ['id' => $id]);
+                //dd($question);
+
+                $restAPIController = new RestAPIController();
+
+                $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
+
+                $project->addTemplateQuestion($questToUpdate);
+                $this->entmanager->flush();
+                //dd($question);
+                //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+                $projectAux = clone $project;
+                $projectAux->setTemplateQuestions(new ArrayCollection());
+                $projectAux->addTemplateQuestion($question);
+
+                $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+
+                if ($responseToPetition->getStatusCode() == 200) {
+                    $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                    $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                    //$answers = [];
+                    foreach ($possibleQueries as $possibleQuery) {
+                        $newAnswer = new Answer();
+                        //dd($possibleQuery);
+                        $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                        $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                        $newAnswer->setAnswer($possibleQuery["answer"]);
+                        $newAnswer->setSelected(false);
+                        $question->addAnswer($newAnswer);
+                        //array_push($answers, $newAnswer);
+                    }
+
+                    $session->set('question', $question);
+
+                    return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
+                }
+            }
+
+
+
             $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
 
@@ -154,14 +214,15 @@ class ProjectsController extends AbstractController
 
             if ($formAnswer->isSubmitted() && $formAnswer->isValid()) {
                 $questToUpdate = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $question->getId()], []);
-
+                //dd($questToUpdate);
+                //$questToUpdate->setAnswers();
                 foreach ($question->getAnswers() as $ans) {
                     $questToUpdate->addAnswer($ans);
                 }
 
                 $this->entmanager->flush();
 
-                $session->remove('question');
+
 
                 $restAPIController = new RestAPIController();
 
@@ -198,6 +259,7 @@ class ProjectsController extends AbstractController
 
             return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
                 'form' => $formAnswer,
+                'form_2' => $form2,
                 'schema' => $schema
             ]);
         } else {
@@ -320,6 +382,63 @@ class ProjectsController extends AbstractController
         if ($pass == true) {
             $question = $this->entmanager->getRepository(Question::class)->findOneBy(['id' => $id_template], []);
 
+
+            $form2 = $this->createForm(QuestionFormType::class, $question);
+
+            //Obtenim la petició
+            $form2->handleRequest($request);
+
+            //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
+            if ($form2->isSubmitted() && $form2->isValid()) {
+                foreach ($question->getAnswers() as $answr) {
+                    //$question->removeAnswer($answr);
+                    $this->entmanager->remove($answr);
+                }
+                $question->setTemplateQuestion($form2->getData()->getTemplateQuestion());
+
+                $this->entmanager->flush();
+                //return $this->redirectToRoute('app_project_info', ['id' => $id]);
+                //dd($question);
+
+                $restAPIController = new RestAPIController();
+
+                $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
+
+                $project->addTemplateQuestion($question);
+                $this->entmanager->flush();
+                //dd($question);
+                //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
+                $projectAux = clone $project;
+                $projectAux->setTemplateQuestions(new ArrayCollection());
+                $projectAux->addTemplateQuestion($question);
+
+                $responseToPetition = $restAPIController->getPossibilities($projectAux);
+
+
+                if ($responseToPetition->getStatusCode() == 200) {
+                    $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
+                    $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
+
+                    //$answers = [];
+                    foreach ($possibleQueries as $possibleQuery) {
+                        $newAnswer = new Answer();
+                        //dd($possibleQuery);
+                        $newAnswer->setStatement(implode(",", $possibleQuery["templateQuestions"]));
+                        $newAnswer->setQuery($possibleQuery["textOfQuery"]);
+                        $newAnswer->setAnswer($possibleQuery["answer"]);
+                        $newAnswer->setSelected(false);
+                        $question->addAnswer($newAnswer);
+                        //array_push($answers, $newAnswer);
+                    }
+
+                    $session->set('question', $question);
+
+                    return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
+                }
+            }
+
+
+
             $formAnswer = $this->createForm(AnswersFormType::class, $question);
 
             $formAnswer->handleRequest($request);
@@ -328,8 +447,6 @@ class ProjectsController extends AbstractController
                 $this->entmanager->flush();
 
                 $questToXML = clone $question;
-
-
 
                 //dd(array_values($questToXML->getAnswers()->toArray()));
 
@@ -371,6 +488,7 @@ class ProjectsController extends AbstractController
 
             return $this->renderForm("projects/templates/editgeneratedtemplates.html.twig", [
                 'form' => $formAnswer,
+                'form_2' => $form2,
                 'schema' => $schema
             ]);
         } else {
@@ -389,7 +507,11 @@ class ProjectsController extends AbstractController
 
             $questionManager = $this->entmanager->getRepository(Question::class);
             $question = $questionManager->findOneBy(['id' => $id_template], []);
-            $question->setAnswers(new ArrayCollection());
+            //$question->setAnswers(new ArrayCollection());
+
+
+
+            //$question->setAnswers(new ArrayCollection());*/
             $form = $this->createForm(QuestionFormType::class, $question);
 
             //Obtenim la petició
@@ -397,16 +519,23 @@ class ProjectsController extends AbstractController
 
             //Comprovem si el formulari s'ha entregat i es valid, en cas contrariu es que haura entrat a la pàgina només.
             if ($form->isSubmitted() && $form->isValid()) {
+                foreach ($question->getAnswers() as $answr) {
+                    //$question->removeAnswer($answr);
+                    $this->entmanager->remove($answr);
+                }
                 $question->setTemplateQuestion($form->getData()->getTemplateQuestion());
+
                 $this->entmanager->flush();
                 //return $this->redirectToRoute('app_project_info', ['id' => $id]);
-
+                //dd($question);
 
                 $restAPIController = new RestAPIController();
 
                 $project = $this->entmanager->getRepository(Project::class)->findOneBy(['id' => $id], []);
+
                 $project->addTemplateQuestion($question);
                 $this->entmanager->flush();
+                //dd($question);
                 //Creem un auxiliar per garantitzar així que a l'hora de mostrar el resultat al usuari sols es mostraran les templates creades al moment
                 $projectAux = clone $project;
                 $projectAux->setTemplateQuestions(new ArrayCollection());

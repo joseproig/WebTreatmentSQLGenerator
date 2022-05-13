@@ -23,7 +23,7 @@ class Answer implements JsonSerializable
     #[ORM\Column(type: 'text')]
     private $answer;
 
-    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'answers', cascade: ["persist", "remove"])]
+    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'answers', cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
     private $templateQuestion;
 
