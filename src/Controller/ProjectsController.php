@@ -159,10 +159,11 @@ class ProjectsController extends AbstractController
 
                 $questToUpdate->setTemplateQuestion($form2->getData()->getTemplateQuestion());
 
-                foreach ($question->getAnswers() as $answr) {
+                foreach ($questToUpdate->getAnswers() as $answr) {
                     //$question->removeAnswer($answr);
                     $this->entmanager->remove($answr);
                 }
+
 
                 $this->entmanager->flush();
                 //return $this->redirectToRoute('app_project_info', ['id' => $id]);
@@ -186,7 +187,7 @@ class ProjectsController extends AbstractController
                 if ($responseToPetition->getStatusCode() == 200) {
                     $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
                     $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
-
+                    //$question->removeAnswers();
                     //$answers = [];
                     foreach ($possibleQueries as $possibleQuery) {
                         $newAnswer = new Answer();
@@ -195,11 +196,11 @@ class ProjectsController extends AbstractController
                         $newAnswer->setQuery($possibleQuery["textOfQuery"]);
                         $newAnswer->setAnswer($possibleQuery["answer"]);
                         $newAnswer->setSelected(false);
-                        $question->addAnswer($newAnswer);
+                        $questToUpdate->addAnswer($newAnswer);
                         //array_push($answers, $newAnswer);
                     }
 
-                    $session->set('question', $question);
+                    $session->set('question', $questToUpdate);
 
                     return $this->redirectToRoute('app_generate_query_answers', ['id' => $id]);
                 }
@@ -325,7 +326,7 @@ class ProjectsController extends AbstractController
                     //Només enviarem una template, per tant fem un pop perque només tindrem en compte una template, no multiples
                     $possibleQueriesOfMultipleTemplates = $responseToPetition->getResponse()->getPossibleQueries();
                     $possibleQueries = array_pop($possibleQueriesOfMultipleTemplates);
-
+                    //$question->removeAnswers();
                     //$answers = [];
                     foreach ($possibleQueries as $possibleQuery) {
                         $newAnswer = new Answer();

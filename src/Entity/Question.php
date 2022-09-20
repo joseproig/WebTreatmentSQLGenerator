@@ -114,6 +114,14 @@ class Question implements JsonSerializable
         return $this;
     }
 
+    public function removeAnswers(): self
+    {
+        if (!(is_null($this->answers))) {
+            $this->answers->clear();
+        }
+        return $this;
+    }
+
     public function jsonSerialize()
     {
         return [
